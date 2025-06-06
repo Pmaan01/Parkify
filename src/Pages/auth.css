@@ -1,32 +1,20 @@
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #000;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.auth-container {
+.auth-container,
+.home-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 30px 20px;
-    background-color: #000;
+    padding: 20px;
     text-align: center;
+    background-color: #000;
+    color: white;
 }
 
 .logo {
     width: 100px;
     margin-bottom: 20px;
     border-radius: 10px;
-}
-
-h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    font-weight: 600;
 }
 
 input {
@@ -36,14 +24,9 @@ input {
     margin: 8px 0;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
     background-color: #1a1a1a;
     color: white;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-}
-
-input::placeholder {
-    color: #aaa;
+    font-size: 16px;
 }
 
 button {
@@ -56,23 +39,22 @@ button {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: #4314b0;
-}
-
-p {
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-a {
+button.outline {
+    background: transparent;
+    border: 2px solid #5C2ED6;
     color: #C084FC;
-    text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+.home-img {
+    width: 300px;
+    margin: 30px 0;
+}
+
+.home-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
