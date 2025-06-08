@@ -8,7 +8,12 @@ export default function Home() {
             <h1> Welcome to Parkify</h1>
             <p>Find your perfect parking spot without circling the block!</p>
 
-            <img src="/Car.png" alt="Car Illustration" className="home-img" />
+            <div className="car-lane-group">
+                <img src="/Lines.png" alt="lane left" className="lane-img" />
+                <img src="/Car2.png" alt="Car Illustration" className="home-img" />
+                <img src="/Lines.png" alt="lane right" className="lane-img" />
+            </div>
+
 
             <div className="home-buttons">
                 <Link to="/signup"><button>Get Started</button></Link>
