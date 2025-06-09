@@ -7,24 +7,35 @@ export default function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSignup = async () => {
-        if (!name || !email || !password) {
+        const trimmedName = name.trim();
+        const trimmedEmail = email.trim();
+        const trimmedPassword = password.trim();
+
+        if (!trimmedName || !trimmedEmail || !trimmedPassword) {
             alert("Please fill in all fields.");
             return;
         }
 
+        setLoading(true);
+
         try {
-            const res = await axios.post("https://parkify-backend-t4ju.onrender.com/api/auth/signup", {
-                name,
-                email,
-                password,
+            const res = await axios.post("http://localhost:5000/api/auth/signup", {
+                name: trimmedName,
+                email: trimmedEmail,
+                password: trimmedPassword,
             });
+
             alert("Signup successful!");
             navigate("/login");
         } catch (err) {
-            alert("Signup failed. Email may already exist.");
+            const errorMsg = err.response?.data?.error || "Signup failed. Try again.";
+            alert(errorMsg);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -47,12 +58,15 @@ export default function Signup() {
             />
             <input
                 type="password"
-                placeholder="Password"
+                placeholder="Password (min 6 chars)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button onClick={handleSignup}>Create Account</button>
+            <button onClick={handleSignup} disabled={loading}>
+                {loading ? "Creating..." : "Create Account"}
+            </button>
+
             <p>Already have an account? <Link to="/login">Login</Link></p>
         </div>
     );
