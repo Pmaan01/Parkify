@@ -4,12 +4,29 @@
   padding: 2rem;
   text-align: center;
 
+  font-family: 'Roboto', 'Segoe UI', Helvetica, Arial, sans-serif;
+
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
 }
+.car-lane-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.lane-img {
+  height: 250px;
+  width: auto;
+  margin: 0 10px;
+  position: relative;
+}
+
 
 .logo {
   height: 6em;
