@@ -1,0 +1,105 @@
+.spots-container {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #000000;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  font-size: 1.5rem;
+  margin-right: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.filter-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filter-tabs button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #2c2c3e;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #252538);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+.header-left {
+  flex: 0 0 auto;
+}
+
+.back-btn {
+  font-size: 1.8rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.header-title h2 {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+
+.filter-tabs button.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+
+.spot-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.spot-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(237, 202, 202, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.spot-card:hover {
+  transform: translateY(-5px);
+}
+
+.spot-card h4 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.spot-details p {
+  margin: 5px 0;
+  color: #555;
+}

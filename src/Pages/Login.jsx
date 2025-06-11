@@ -15,11 +15,11 @@ export default function Login() {
         }
 
         try {
-            const res = await axios.post("https://parkify-backend-t4ju.onrender.com/api/auth/login", {
+            const res = await axios.post("http://localhost:5000/api/auth/login", {
                 email, password
             });
             alert("Login successful!");
-            navigate("/");
+            navigate("/home");
         } catch (err) {
             alert("Login failed. Please check your credentials.");
         }
