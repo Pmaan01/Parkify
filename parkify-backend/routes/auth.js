@@ -123,4 +123,69 @@ router.post("/login", async (req, res) => {
 });
 
 
+// Route to get the user's profile data
+router.get("/profile", async (req, res) => {
+
+     // Extract token from the Authorization header
+  const token = req.headers.authorization?.split(' ')[1];
+
+  // If no token is provided, respond with 401 Unauthorized
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  try {
+    // Verify the token using the secret key
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+     // Find the user in the database using the email from the decoded token
+    // Exclude the password field from the returned user object
+    const user = await User.findOne({ email: decoded.email }).select('-password');
+
+    // If user not found, respond with 404
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Return the user data
+    res.status(200).json(user);
+  } catch (err) {
+
+    // If token verification fails or any other error occurs, respond with 500
+    res.status(500).json({ message: "Invalid token", error: err.message });
+  }
+});
+
+// Route to update the user's profile information
+router.put("/profile", async (req, res) => {
+
+     // Extract the token from the Authorization header (format: "Bearer <token>")
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  try {
+
+    // Verify and decode the JWT using the server's secret key
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+    // Extract the new profile data from the request body
+    const { name, email, phoneNumber, vehicleNumber } = req.body;
+
+    // Find the user by the decoded email and update the profile fields
+    const updatedUser = await User.findOneAndUpdate(
+      { email: decoded.email },
+      { name, email, phoneNumber, vehicleNumber },
+      { new: true, runValidators: true, select: '-password' }
+    );
+
+     // If no user is found with that email, return a not found error
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    
+    // Send back a success message with the updated user data
+    res.status(200).json({ message: "Profile updated successfully", data: updatedUser });
+  } catch (err) {
+
+    // Catch any errors (e.g. invalid token, DB errors) and return a 500 error
+    res.status(500).json({ message: "Error updating profile", error: err.message });
+  }
+
+});
+
+
 module.exports = router;

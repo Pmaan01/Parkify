@@ -19,6 +19,8 @@ export default function Login() {
                 email, password
             });
             alert("Login successful!");
+            // Store the token in localStorage
+            localStorage.setItem('token', res.data.token);
             navigate("/home");
         } catch (err) {
             alert("Login failed. Please check your credentials.");

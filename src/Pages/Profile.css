@@ -13,8 +13,7 @@
     border-radius: 3%;
     box-sizing: border-box;
     overflow: hidden; /* hides overflow to stop scroll */
-    width: 100%;
-
+     width: 100%;
 }
 
 /* Buttons */
@@ -44,6 +43,7 @@ button {
   position: fixed;
   bottom: 0;
   width: 100%;
+  max-width: 560px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(to right, #0d0d18, #1e1e3f);
@@ -94,4 +94,15 @@ button {
   }
 }
 
+/* Inner scrollable content wrapper to avoid overlap with navbar */
+.profile-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 20px;
+  padding-bottom: 100px; /* space above navbar */
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
 
