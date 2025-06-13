@@ -4,12 +4,14 @@ import { useLocation } from 'react-router-dom';
 import '../ParkingSpots.css';
 
 const ParkingSpots = () => {
-  const [spots, setSpots] = useState([]);
+  const [paidSpots, setPaidSpots] = useState([]);
+  const [freeSpots, setFreeSpots] = useState([]);
   const [type, setType] = useState("All");
 
   const query = new URLSearchParams(useLocation().search);
   const location = query.get("location") || "Vancouver";
 
+  // Fetch Paid spots from Vancouver API
   useEffect(() => {
     axios
       .get(
@@ -18,20 +20,40 @@ const ParkingSpots = () => {
         )}%25%27&limit=50`
       )
       .then((res) => {
-        setSpots(res.data.results);
+        setPaidSpots(res.data.results);
       })
-      .catch(() => setSpots([]));
+      .catch(() => setPaidSpots([]));
   }, [location]);
 
+  // Fetch Free spots from your backend
+ useEffect(() => {
+  axios.get("http://localhost:5000/api/free-parking")
+    .then((res) => {
+      const filteredFree = res.data.filter(spot => 
+        spot.address.toLowerCase().includes(location.toLowerCase()) || 
+        spot.name.toLowerCase().includes(location.toLowerCase())
+      );
+      setFreeSpots(filteredFree);
+    })
+    .catch(() => setFreeSpots([]));
+}, [location]);
+
+
+  const combinedSpots = [...paidSpots, ...freeSpots];
+
   const filteredSpots = type === "All"
-    ? spots
-    : spots.filter((spot) => {
-        const rates = [
-          spot.r_mf_9a_6p, spot.r_mf_6p_10, spot.r_sa_9a_6p,
-          spot.r_sa_6p_10, spot.r_su_9a_6p, spot.r_su_6p_10, spot.rate_misc
-        ];
-        const isPaid = rates.some(r => r && r.trim() !== "$0.00");
-        return type === "Paid" ? isPaid : !isPaid;
+    ? combinedSpots
+    : combinedSpots.filter((spot) => {
+        if (spot.meterid) {  // Paid spot (Vancouver meter)
+          const rates = [
+            spot.r_mf_9a_6p, spot.r_mf_6p_10, spot.r_sa_9a_6p,
+            spot.r_sa_6p_10, spot.r_su_9a_6p, spot.r_su_6p_10, spot.rate_misc
+          ];
+          const isPaid = rates.some(r => r && r.trim() !== "$0.00");
+          return type === "Paid" ? isPaid : !isPaid;
+        } else {  // Free spot from DB
+          return type === "Free";
+        }
       });
 
   return (
@@ -60,27 +82,36 @@ const ParkingSpots = () => {
           <p>No {type.toLowerCase()} parking spots found in {location}.</p>
         ) : (
           filteredSpots.map((spot, index) => {
-            const rate =
-              spot.r_mf_9a_6p ||
-              spot.r_mf_6p_10 ||
-              spot.r_sa_9a_6p ||
-              spot.r_sa_6p_10 ||
-              spot.r_su_9a_6p ||
-              spot.r_su_6p_10 ||
-              spot.rate_misc ||
-              "$0.00";
+            if (spot.meterid) {
+              // Paid meter display
+              const rate =
+                spot.r_mf_9a_6p || spot.r_mf_6p_10 || spot.r_sa_9a_6p || spot.r_sa_6p_10 || spot.r_su_9a_6p || spot.r_su_6p_10 || spot.rate_misc || "$0.00";
 
-            return (
-              <div className="spot-card" key={index}>
-                <h4>Meter {spot.meterid || "N/A"}</h4>
-                <div className="spot-details">
-                  <p><b>Rate:</b> {rate.trim() === "$0.00" ? "Free" : rate}</p>
-                  <p><b>Time Limit:</b> {spot.t_mf_9a_6p || spot.time_misc || "Unknown"}</p>
-                  <p><b>Area:</b> {spot.geo_local_area || "Unknown"}</p>
-                  <p><b>Credit Card:</b> {spot.creditcard === "Yes" ? "✅" : "❌"}</p>
+              return (
+                <div className="spot-card" key={index}>
+                  <h4>Meter {spot.meterid || "N/A"}</h4>
+                  <div className="spot-details">
+                    <p><b>Rate:</b> {rate.trim() === "$0.00" ? "Free" : rate}</p>
+                    <p><b>Time Limit:</b> {spot.t_mf_9a_6p || spot.time_misc || "Unknown"}</p>
+                    <p><b>Area:</b> {spot.geo_local_area || "Unknown"}</p>
+                    <p><b>Credit Card:</b> {spot.creditcard === "Yes" ? "✅" : "❌"}</p>
+                  </div>
                 </div>
-              </div>
-            );
+              );
+            } else {
+              // Free spot from your DB
+              return (
+                <div className="spot-card" key={index}>
+                  <h4>{spot.name}</h4>
+                  <div className="spot-details">
+                    <p><b>Type:</b> {spot.type}</p>
+                    <p><b>Address:</b> {spot.address}</p>
+                    <p><b>Hours:</b> {spot.hours}</p>
+                    <p><b>Notes:</b> {spot.notes}</p>
+                  </div>
+                </div>
+              );
+            }
           })
         )}
       </div>

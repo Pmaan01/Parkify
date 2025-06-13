@@ -46,7 +46,7 @@
   height: 50px;
 }
 
-.location-box input {
+.go-btn {
   border: none;
   outline: none;
   padding: 10px;
@@ -54,7 +54,40 @@
   font-size: 14px;
   color: black;
   background: transparent;
+  background-color: white;
+  border-radius: 30px 0 0 30px;
+  height: 50px;
+  appearance: none; /* removes default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
 }
+
+.location-select {
+  border: none;
+  outline: none;
+  padding: 10px;
+  width: 280px;
+  font-size: 14px;
+  color: black;
+  background: transparent;
+  background-color: white;
+  border-radius: 30px 0 0 30px;
+  height: 50px;
+  appearance: none; /* removes default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+  .location-select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg ... your arrow svg ... %3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
 .car {
   width: 100%;
   max-width: 800px; /* Control max width */
@@ -68,19 +101,6 @@
 }
 
 
-.go-btn {
-  background-color: white;
-  border: none;
-  border-radius: 0 30px 30px 0;
-  height: 50px;
-  width: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 20px;
-  box-shadow: #00ffff;
-}
 
 /* Illustration Image */
 .illustration {

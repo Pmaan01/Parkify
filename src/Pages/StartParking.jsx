@@ -27,14 +27,18 @@ const StartParking = () => {
       <p className="subtitle">No more circling the block – your perfect spot is just a tap away.</p>
 
       <div className="location-input">
-        <input
-          type="text"
-          placeholder="Enter your Location..."
+        <select
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-        />
+          className="location-select"
+        >
+          <option value="">Select Location...</option>
+          <option value="Vancouver">Vancouver</option>
+          <option value="Downtown">Downtown</option>
+        </select>
         <button onClick={handleStart} className="search-btn">Search 🔎</button>
       </div>
+
       <div className="car">
         
       </div>
