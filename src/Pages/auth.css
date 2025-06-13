@@ -57,7 +57,7 @@ p {
 /* Buttons */
 button {
     background-color: #5C2ED6;
-    color: white;
+    color: rgb(23, 22, 22);
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -104,3 +104,5 @@ input {
         padding: 10px 20px;
     }
 }
+
+
