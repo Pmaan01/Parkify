@@ -4,6 +4,11 @@ import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
 import StartParking from "./Pages/StartParking"; 
 import ParkingSpots from "./Pages/ParkingSpots";
+import React from 'react';
+import Profile from './Pages/Profile'; // adjust path based on location
+
+
+
 
 
 function App() {
@@ -14,6 +19,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
       <Route path="/spots" element={<ParkingSpots />} />
+      <Route path="profile" element={<Profile />} />
 
     </Routes>
   );
