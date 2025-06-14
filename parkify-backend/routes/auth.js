@@ -96,7 +96,9 @@ router.post("/login", async (req, res) => {
         const accessToken = jwt.sign(
             {
                 name: foundUser.name,
-                email: foundUser.email
+                email: foundUser.email,
+                id: foundUser._id
+
             },
             process.env.SECRET_KEY,
             { expiresIn: "1h" }
@@ -154,7 +156,8 @@ router.get("/profile", async (req, res) => {
 
 // Route to update the user's profile information
 router.put("/profile", async (req, res) => {
-
+    console.log(req.body, "Show Success ")
+debugger;
      // Extract the token from the Authorization header (format: "Bearer <token>")
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
@@ -168,8 +171,8 @@ router.put("/profile", async (req, res) => {
     const { name, email, phoneNumber, vehicleNumber } = req.body;
 
     // Find the user by the decoded email and update the profile fields
-    const updatedUser = await User.findOneAndUpdate(
-      { email: decoded.email },
+    const updatedUser = await User.findByIdAndUpdate(
+        decoded.id ,
       { name, email, phoneNumber, vehicleNumber },
       { new: true, runValidators: true, select: '-password' }
     );
