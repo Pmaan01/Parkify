@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
+import { MdHome, MdCarRental, MdSettings, MdPerson } from "react-icons/md";
 
 export default function Profile() {
   const [user, setUser] = useState({ name: '', email: '', phoneNumber: '', vehicleNumber: '' });
@@ -10,7 +11,6 @@ export default function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('Token on mount:', token);
     if (token) {
       axios.get('http://localhost:5000/api/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
@@ -27,16 +27,13 @@ export default function Profile() {
     }
   }, []);
 
-   const handleSave = async () => {
-    console.log('Saving user data:', user);
+  const handleSave = async () => {
     const token = localStorage.getItem('token');
-    console.log('Token during save:', token);
     if (token) {
       try {
         const response = await axios.put('http://localhost:5000/api/auth/profile', user, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('Save response:', response.data);
         alert('Profile saved successfully!');
       } catch (err) {
         console.error('Error saving profile:', err.response ? err.response.data : err.message);
@@ -47,9 +44,8 @@ export default function Profile() {
     }
   };
 
-
   return (
-    <div className="auth-container">
+    <div className="profile-container">
       <div className="profile-content">
         <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
         <h2>My Profile</h2>
@@ -80,12 +76,15 @@ export default function Profile() {
         <button onClick={handleSave}>Save</button>
       </div>
 
-      <div className="bottom-nav">
-        <div className="nav-icon" onClick={() => navigate('/home')}>🏠</div>
-        <div className="nav-icon" onClick={() => navigate('/status')}>🚗</div>
-        <div className="nav-icon" onClick={() => navigate('/settings')}>⚙️</div>
-        <div className="nav-icon active" onClick={() => navigate('/profile')}>👤</div>
+
+      <div className="bottom-navbar">
+        <div className="nav-icon" onClick={() => navigate("/home")}><MdHome size={50} /></div>
+        <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>
+        <div className="nav-icon" onClick={() => handleNavClick("/settings")}><MdSettings size={50} /></div>
+        <div className="nav-icon activate" onClick={() => handleNavClick("/profile")}><MdPerson size={50} /></div>
       </div>
+      
     </div>
   );
 }
+

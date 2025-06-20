@@ -1,19 +1,57 @@
-.auth-container,
-.home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between; /* spreads elements */
-    height: 100vh; /* full height of viewport */
-    padding: 0 16px; /* horizontal padding only */
-    background-color: #000;
-    color: white;
-    text-align: center;
-    margin: 0 auto;
-    border-radius: 3%;
-    box-sizing: border-box;
-    overflow: hidden; /* hides overflow to stop scroll */
-     width: 100%;
+/* Main Container */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 0 16px;
+  background-image: url('/profile.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  text-align: center;
+  margin: 0 auto;
+  border-radius: 3%;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+}
+
+.profile-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+/* Inner scrollable content wrapper */
+.profile-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 20px;
+  padding-bottom: 100px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+/* Logo */
+.logo {
+  width: 110px;
+  margin: 1rem auto;
+
 }
 
 /* Buttons */
@@ -33,10 +71,8 @@ button {
   transition: all 0.3s ease;
 }
 
-
-
 /* Bottom Nav */
-.bottom-nav {
+.bottom-navbar {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -51,6 +87,7 @@ button {
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   box-shadow: 0 -5px 15px rgba(31, 8, 90, 0.8);
+  z-index: 3;
 }
 
 /* Bottom Nav Icons */
@@ -94,15 +131,15 @@ button {
   }
 }
 
-/* Inner scrollable content wrapper to avoid overlap with navbar */
-.profile-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 20px;
-  padding-bottom: 100px; /* space above navbar */
-  width: 100%;
-  max-width: 950px;
-  margin: 0 auto;
-  box-sizing: border-box;
+/* Small devices */
+@media (max-width: 400px) {
+  input, button {
+    width: 90%;
+  }
+
+  .logo {
+    width: 100px;
+  }
 }
+
 
