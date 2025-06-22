@@ -69,7 +69,7 @@ const ParkingSpots = () => {
   useEffect(() => {
     const fetchSpots = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/free-parking");
+        const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/free-parking");
         const filtered = res.data.filter((spot) => {
           const loc = location.toLowerCase();
           return loc === "vancouver"

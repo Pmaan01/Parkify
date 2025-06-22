@@ -12,7 +12,7 @@ export default function Profile() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('http://localhost:5000/api/auth/profile', {
+      axios.get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         setUser({ 
@@ -31,7 +31,7 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.put('http://localhost:5000/api/auth/profile', user, {
+        const response = await axios.put('https://parkify-web-app-backend.onrender.com/auth/profile', user, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('Profile saved successfully!');
