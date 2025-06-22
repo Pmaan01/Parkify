@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const FreeParking = require("./models/FreeParking");  // your model
+const FreeParking = require("./models/FreeParking");  
 
 require("dotenv").config();
 

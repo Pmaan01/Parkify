@@ -12,7 +12,6 @@ const StartParking = () => {
       alert("Please enter your location");
       return;
     }
-    // Show all spots: Paid + Free
     const selectedType = "All";
     navigate(`/spots?location=${encodeURIComponent(location)}&type=${selectedType}`);
   };
@@ -35,7 +34,9 @@ const StartParking = () => {
         >
           <option value="">Select Location...</option>
           <option value="Vancouver">Vancouver</option>
-          {/* Add more options like Surrey, Burnaby later */}
+          <option value="Surrey">Surrey</option>
+          <option value="New Westminster">New Westminster</option>
+          <option value="Richmond">Richmond</option>
         </select>
         <button onClick={handleStart} className="search-btn">Search 🔎</button>
       </div>
