@@ -11,12 +11,36 @@ header {
   margin-bottom: 20px;
 }
 
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1e1e2f, #252538);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 0 10px #00ffff;
+  margin-bottom: 20px;
+}
+
+.header-left {
+  flex: 0 0 auto;
+}
+
 .back-btn {
-  font-size: 1.5rem;
-  margin-right: 10px;
-  cursor: pointer;
+  font-size: 1.8rem;
+  color: #fff;
   background: none;
   border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.header-title h2 {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 0;
 }
 
 .filter-tabs {
@@ -34,46 +58,14 @@ header {
   color: #fff;
   font-weight: 500;
   transition: 0.3s;
-}
-.top-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #1e1e2f, #252538);
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  margin-bottom: 20px;
-  box-shadow: 0 0 10px #00ffff;
-}
-
-.header-left {
-  flex: 0 0 auto;
-}
-
-.back-btn {
-  font-size: 1.8rem;
-  color: #fff;
-  background: none;
-  border: none;
   cursor: pointer;
 }
-
-.header-title h2 {
-  color: #fff;
-  font-weight: 600;
-  font-size: 1.4rem;
-  margin: 0;
-}
-
 
 .filter-tabs button.active {
   background: #007bff;
   color: white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
-
 
 .spot-list {
   display: grid;
@@ -102,4 +94,21 @@ header {
 .spot-details p {
   margin: 5px 0;
   color: #555;
+}
+
+/* ✅ Get Directions Button */
+.get-directions-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #3a5a7c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.get-directions-btn:hover {
+  background-color: #0056b3;
 }

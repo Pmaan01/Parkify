@@ -12,11 +12,11 @@ const StartParking = () => {
       alert("Please enter your location");
       return;
     }
-    const selectedType = "paid";
+    // Show all spots: Paid + Free
+    const selectedType = "All";
     navigate(`/spots?location=${encodeURIComponent(location)}&type=${selectedType}`);
   };
 
-  // Navigation button handlers
   const handleNavClick = (path) => {
     navigate(path);
   };
@@ -35,14 +35,12 @@ const StartParking = () => {
         >
           <option value="">Select Location...</option>
           <option value="Vancouver">Vancouver</option>
-          <option value="Downtown">Downtown</option>
+          {/* Add more options like Surrey, Burnaby later */}
         </select>
         <button onClick={handleStart} className="search-btn">Search 🔎</button>
       </div>
 
-      <div className="car">
-        
-      </div>
+      <div className="car"></div>
 
       <div className="bottom-nav">
         <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
