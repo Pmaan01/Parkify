@@ -43,6 +43,10 @@ const StartParking = () => {
 
       <div className="car"></div>
 
+
+      <button className="score-btn" onClick={() => navigate("/scoreboard")}>🏆</button>
+
+
       <div className="bottom-nav">
         <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
         <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>
