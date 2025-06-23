@@ -6,22 +6,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 // ✅ Connect to DB
 require('./db');
 
-// ✅ Import and use routes
-const authRoutes = require("./routes/auth");
+// ✅ Import models and routes
 const FreeParking = require("./models/FreeParking");
+const authRoutes = require("./routes/auth");
 const scoreRoutes = require("./routes/score");
 
+// ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/score", scoreRoutes);
 
+// ✅ Free parking route
 app.get("/api/free-parking", async (req, res) => {
-  const spots = await FreeParking.find({});
-  res.json(spots);
+  try {
+    const spots = await FreeParking.find({});
+    res.json(spots);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch parking spots." });
+  }
 });
 
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
