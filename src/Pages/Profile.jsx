@@ -31,7 +31,7 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.put('https://parkify-web-app-backend.onrender.com/auth/profile', user, {
+        const response = await axios.put('https://parkify-web-app-backend.onrender.com/api/auth/profile', user, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('Profile saved successfully!');
