@@ -11,10 +11,12 @@ app.use(express.json());
 require('./db');
 
 // ✅ Import and use routes
-const authRoutes = require("./routes/auth"); 
+const authRoutes = require("./routes/auth");
 const FreeParking = require("./models/FreeParking");
+const scoreRoutes = require("./routes/score");
 
-app.use("/api/auth", authRoutes); 
+app.use("/api/auth", authRoutes);
+app.use("/api/score", scoreRoutes);
 
 app.get("/api/free-parking", async (req, res) => {
   const spots = await FreeParking.find({});
