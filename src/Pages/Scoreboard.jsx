@@ -24,12 +24,13 @@ export default function Scoreboard() {
 
             <h2>🏆 Top Parkify Users</h2>
 
-            <ul>
+            <ul className="score-list">
                 {scores.map((user, index) => (
-                    <li key={user._id} className={index < 3 ? "top-three" : ""}>
-                        <span>{index + 1}. {user.displayName}</span>
-                        <span>{user.score} pts</span>
-                        {index < 3 && <span className="badge">⭐</span>}
+                    <li key={user._id} className={`score-item ${index < 3 ? 'top-three' : ''}`}>
+                        <span className="rank">{index + 1}.</span>
+                        <span className="name">{user.displayName}</span>
+                        <span className="points">{user.score} pts</span>
+                        {index < 3 && <span className="badge">{["🥇", "🥈", "🥉"][index]}</span>}
                     </li>
                 ))}
             </ul>

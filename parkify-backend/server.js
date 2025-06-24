@@ -17,6 +17,9 @@ const scoreRoutes = require("./routes/score");
 // ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/score", scoreRoutes);
+console.log("scoreRoutes =", scoreRoutes);
+console.log("typeof scoreRoutes =", typeof scoreRoutes);
+
 
 // ✅ Free parking route
 app.get("/api/free-parking", async (req, res) => {
