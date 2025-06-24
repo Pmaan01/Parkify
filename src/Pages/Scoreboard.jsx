@@ -9,10 +9,11 @@ export default function Scoreboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("https://parkify-web-app-backend.onrender.com/api/score/top")
+        axios.get("http://localhost:5001/api/score/top")
             .then(res => setScores(res.data))
             .catch(err => console.error("Error fetching scores", err));
     }, []);
+
 
     return (
         <div className="scoreboard-container">
