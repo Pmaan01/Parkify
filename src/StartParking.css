@@ -67,12 +67,10 @@
 }
 
 .score-btn {
-  position: fixed;
-  /* Always use fixed for floating buttons */
-  bottom: 90px;
-  /* Just above nav */
+  position: absolute;
+  top: 20px;
+
   right: 20px;
-  /* Perfectly visible */
   background-color: #5C2ED6;
   border: none;
   border-radius: 50%;
