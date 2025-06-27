@@ -9,7 +9,7 @@ export default function Scoreboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:5001/api/score/top")
+        axios.get("https://parkify-web-app-xi.vercel.app/")
             .then(res => setScores(res.data))
             .catch(err => console.error("Error fetching scores", err));
     }, []);
