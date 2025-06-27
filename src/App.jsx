@@ -2,8 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
 import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
-import StartParking from "./Pages/StartParking"; 
+import StartParking from "./Pages/StartParking";
 import ParkingSpots from "./Pages/ParkingSpots";
+import Scoreboard from "./Pages/Scoreboard";
 import React from 'react';
 import Profile from './Pages/Profile'; // adjust path based on location
 
@@ -20,6 +21,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/spots" element={<ParkingSpots />} />
       <Route path="profile" element={<Profile />} />
+      <Route path="/scoreboard" element={<Scoreboard />} />
 
     </Routes>
   );

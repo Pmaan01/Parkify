@@ -1,3 +1,4 @@
+// StartParking.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../StartParking.css";
@@ -42,6 +43,14 @@ const StartParking = () => {
       </div>
 
       <div className="car"></div>
+
+      <button
+        className="score-btn"
+        onClick={() => navigate("/scoreboard")}
+      >
+        🏆
+      </button>
+
 
       <div className="bottom-nav">
         <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
