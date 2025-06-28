@@ -1,16 +1,20 @@
 const mongoose = require('mongoose');
-const { parkingConnection } = require('../db');
 
 const FreeParkingSchema = new mongoose.Schema({
   name: String,
   type: String,
+  area: String,
   address: String,
   latitude: Number,
   longitude: Number,
-  free: Boolean,
+  paid: Boolean,
+  rate: String,
+  time_limit: String,
+  creditcard: String,
   hours: String,
-  notes: String
+  notes: String,
+  hasSpots: Boolean,
+  availableSpots: Number
 });
 
-const FreeParking = parkingConnection.model("FreeParking", FreeParkingSchema);
-module.exports = FreeParking;
+module.exports = mongoose.model("FreeParking", FreeParkingSchema);
