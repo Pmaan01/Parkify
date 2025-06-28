@@ -14,14 +14,14 @@
   color: white;
   text-align: center;
   margin: 0 auto;
-  border-radius: 3%;
   box-sizing: border-box;
   overflow: hidden;
   width: 100%;
-  max-width: 560px;
+  max-width: 425px;
   position: relative;
 }
 
+/* Dark overlay over background */
 .profile-container::before {
   content: '';
   position: absolute;
@@ -38,7 +38,7 @@
   flex: 1;
   overflow-y: auto;
   padding-top: 20px;
-  padding-bottom: 100px;
+  padding-bottom: 100px; /* Space for navbar */
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -51,7 +51,7 @@
 .logo {
   width: 110px;
   margin: 1rem auto;
-
+  z-index: 2;
 }
 
 /* Buttons */
@@ -61,7 +61,7 @@ button {
   padding: 10px;
   width: 280px;
   font-size: 14px;
-  color: rgb(18, 15, 15);
+  color: white;
   background-color: #1e1e3f;
   border-radius: 30px;
   height: 50px;
@@ -71,7 +71,11 @@ button {
   transition: all 0.3s ease;
 }
 
-/* Bottom Nav */
+button:hover {
+  background-color: #29295a;
+}
+
+/* Bottom Nav (Fixed, Mobile First) */
 .bottom-navbar {
   display: flex;
   justify-content: space-evenly;
@@ -79,36 +83,36 @@ button {
   position: fixed;
   bottom: 0;
   width: 100%;
-  max-width: 560px;
+  max-width: 425px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(to right, #0d0d18, #1e1e3f);
-  padding: 0.8rem 0;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  box-shadow: 0 -5px 15px rgba(31, 8, 90, 0.8);
-  z-index: 3;
+  padding: 0.5rem 0;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -3px 10px rgba(31, 8, 90, 0.6);
+  z-index: 1000;
 }
 
 /* Bottom Nav Icons */
 .nav-icon {
-  font-size: 40px;
+  font-size: 28px;
   color: #aaa;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 10px;
+  border-radius: 12px;
 }
 
 .nav-icon:hover {
-  transform: scale(1.15);
-  color: white;
+  transform: scale(1.1);
+  color: #fff;
 }
 
 .nav-icon.active {
-  color: #0b0101;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #00ffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 5px cyan;
 }
 
 /* Responsive Tweaks for Tablets & Desktop */
@@ -127,7 +131,7 @@ button {
   }
 
   .nav-icon {
-    font-size: 45px;
+    font-size: 32px;
   }
 }
 
@@ -140,6 +144,8 @@ button {
   .logo {
     width: 100px;
   }
+
+  .nav-icon {
+    font-size: 24px;
+  }
 }
-
-

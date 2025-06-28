@@ -6,6 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../ParkingSpots.css';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import parkifyLogo from '../assets/Parkify-logo.jpg';
 
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import availableIcon from '../assets/location.png';
@@ -43,11 +44,16 @@ const ParkingSpots = () => {
   const [allSpots, setAllSpots] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [type, setType] = useState("All");
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [points, setPoints] = useState(0);
+  const [reportedSpots, setReportedSpots] = useState({});
+  const [inputVisible, setInputVisible] = useState({});
+  const [freeCounts, setFreeCounts] = useState({});
+  const [parkedSpotId, setParkedSpotId] = useState(null);
   const navigate = useNavigate();
 
   const query = new URLSearchParams(useLocation().search);
-  const location = query.get("location") || "Vancouver";
+  const selectedArea = query.get("location") || "All";
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -66,92 +72,108 @@ const ParkingSpots = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchSpots = async () => {
-      try {
-        const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/free-parking");
-        const filtered = res.data.filter((spot) => {
-          const loc = location.toLowerCase();
-          return loc === "vancouver"
-            ? spot.area?.toLowerCase().includes("vancouver") || spot.address?.toLowerCase().includes("vancouver")
-            : spot.area?.toLowerCase().includes(loc) || spot.address?.toLowerCase().includes(loc);
-        });
-        setAllSpots(filtered);
-      } catch (err) {
-        console.error("Error fetching spots from DB", err);
-      }
-    };
-
-    fetchSpots();
-  }, [location]);
-
-  useEffect(() => {
-    const lastSpot = localStorage.getItem("navigatedSpot");
-    if (lastSpot) {
-      setTimeout(() => {
-        if (window.confirm("Are you parking here?")) {
-          const spot = JSON.parse(lastSpot);
-          localStorage.removeItem("navigatedSpot");
-
-          const report = window.prompt("Can you see more free spots around? (Enter number)");
-          const num = parseInt(report);
-          if (!isNaN(num) && num >= 0) {
-            setPoints(points + num * 5);
-            alert(`Thanks! You earned ${num * 5} points.`);
-          }
-          navigate("/status", { state: { parkedSpot: spot } });
-        } else {
-          localStorage.removeItem("navigatedSpot");
-          navigate(`/spots?location=${location}`);
-        }
-      }, 1500);
+  const fetchSpots = async () => {
+    try {
+      const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/free-parking");
+      setAllSpots(res.data);
+    } catch (err) {
+      console.error("Error fetching spots from DB", err);
     }
+  };
+
+  useEffect(() => {
+    fetchSpots();
   }, []);
 
-  const filteredSpots = type === "All"
-    ? allSpots.filter((spot) => spot.latitude && spot.longitude)
-    : allSpots.filter((spot) => type === "Paid" ? spot.paid : !spot.paid);
+  const filteredSpots = allSpots
+    .filter((spot) => {
+      if (!spot.latitude || !spot.longitude) return false;
+      if (selectedArea === "All") return true;
+      return (
+        spot.area?.toLowerCase().includes(selectedArea.toLowerCase()) ||
+        spot.address?.toLowerCase().includes(selectedArea.toLowerCase())
+      );
+    })
+    .filter((spot) => {
+      if (type === "All") return true;
+      return type === "Paid" ? spot.paid : !spot.paid;
+    })
+    .filter((spot) => (onlyAvailable ? spot.hasSpots === true : true));
 
   const getMarkerIcon = (spot) => {
     return spot.hasSpots ? blueIcon : redIcon;
   };
 
+  const handleReportSubmit = async (spotId) => {
+    const num = parseInt(freeCounts[spotId]);
+    if (!isNaN(num) && num >= 0) {
+      try {
+        await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spotId}`, {
+          hasSpots: true,
+          availableSpots: num,
+        });
+        await fetchSpots();
+        setPoints((prev) => prev + num * 5);
+        setReportedSpots((prev) => ({ ...prev, [spotId]: true }));
+        alert(`Thanks! You earned ${num * 5} points.`);
+      } catch (error) {
+        console.error("Error updating spot:", error);
+        alert("Failed to update spot.");
+      }
+    }
+  };
+
   return (
     <div className="spots-container">
       <header className="top-header">
-        <div className="header-left">
-          <button className="back-btn" onClick={() => window.history.back()}>
+        <button className="back-btn" onClick={() => window.history.back()}>
             ←
           </button>
-        </div>
         <div className="header-title">
-          <h2>Your Perfect Spot Awaits</h2>
+          <h2>Parking Spots in {selectedArea}</h2>
         </div>
       </header>
 
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginTop: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={availableIcon} alt="Available" style={{ width: '20px' }} />
+          <span style={{ color: '#007bff', fontWeight: 500 }}>Available (Blue)</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={unavailableIcon} alt="Unavailable" style={{ width: '20px' }} />
+          <span style={{ color: '#d32f2f', fontWeight: 500 }}>Occupied (Red)</span>
+        </div>
+      </div>
+
       <div className="filter-tabs">
-        { ["All", "Paid", "Free"].map((tab) => (
-          <button key={tab} className={type === tab ? "active" : ""} onClick={() => setType(tab)}>
+        {['All', 'Paid', 'Free'].map((tab) => (
+          <button key={tab} className={type === tab ? 'active' : ''} onClick={() => setType(tab)}>
             {tab}
           </button>
-        )) }
+        ))}
+      </div>
+
+      <div className="availability-filter">
+        <label>
+          <input
+            type="checkbox"
+            checked={onlyAvailable}
+            onChange={() => setOnlyAvailable(!onlyAvailable)}
+          />
+          <span className="checkmark"></span>
+          Show only available spots
+        </label>
       </div>
 
       <p style={{ textAlign: 'center', marginBottom: '10px', color: '#333', fontWeight: '500' }}>
         Showing <span style={{ color: '#ff5722' }}>{filteredSpots.length}</span> of <span style={{ color: '#ff5722' }}>{allSpots.length}</span> spots
       </p>
 
-      {filteredSpots.length > 1000 && (
-        <p style={{ textAlign: 'center', color: 'gray' }}>
-          Zoom in to see individual markers. Too many spots clustered.
-        </p>
-      )}
-
-      <div style={{ height: "80vh", width: "100%" }}>
+      <div style={{ height: '80vh', width: '100%' }}>
         <MapContainer
           center={userLocation ? [userLocation.lat, userLocation.lng] : [49.2827, -123.1207]}
           zoom={13}
-          style={{ height: "100%", width: "100%" }}
+          style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -170,48 +192,124 @@ const ParkingSpots = () => {
             });
           }}>
             {filteredSpots.map((spot, index) => (
-              spot.latitude && spot.longitude && (
-                <Marker
-                  key={index}
-                  position={[spot.latitude, spot.longitude]}
-                  icon={getMarkerIcon(spot)}
-                >
-                  <Popup>
+              <Marker key={index} position={[spot.latitude, spot.longitude]} icon={getMarkerIcon(spot)}>
+                <Popup>
+                  <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
                     <h4>{spot.name}</h4>
-                    <p><b>Type:</b> {spot.type}</p>
-                    <p><b>Address:</b> {spot.address || 'Unknown'}</p>
-                    <p><b>Rate:</b> {spot.paid ? (spot.rate || 'Check signage') : 'Free'}</p>
-                    <p><b>Hours:</b> {spot.paid ? (spot.hours || '9 AM – 10 PM') : (spot.hours || 'Unknown')}</p>
-                    <p><b>Notes:</b> {spot.paid ? (spot.notes || 'Standard meter info') : (spot.notes || 'None')}</p>
+                    <p><strong>Type:</strong> {spot.type}</p>
+                    <p><strong>Address:</strong> {spot.address || 'Unknown'}</p>
+                    <p><strong>Rate:</strong> {spot.paid ? (spot.rate || 'Check signage') : 'Free'}</p>
+                    <p><strong>Hours:</strong> {spot.paid ? (spot.hours || '9 AM – 10 PM') : (spot.hours || 'Unknown')}</p>
+                    <p><strong>Notes:</strong> {spot.notes || 'None'}</p>
                     {!spot.paid && (
-                      <p><b>Free Spots:</b> {spot.hasSpots ? `Yes (${spot.availableSpots})` : 'No'}</p>
+                      <p><strong>Free Spots:</strong> {spot.hasSpots ? `Yes (${spot.availableSpots})` : 'No'}</p>
                     )}
+
                     <a
                       href={`https://www.google.com/maps/dir/?api=1&destination=${spot.latitude},${spot.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => localStorage.setItem("navigatedSpot", JSON.stringify(spot))}
                     >
-                      <button
-                        style={{
-                          marginTop: "8px",
-                          padding: "6px 12px",
-                          backgroundColor: "#007bff",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "6px",
-                          fontWeight: "500",
-                          cursor: "pointer",
-                          width: "100%",
-                          display: "block"
-                        }}
-                      >
+                      <button style={{ margin: "10px 0", padding: "8px 12px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "6px", width: "100%", fontWeight: "bold", cursor: "pointer" }}>
                         Get Directions
                       </button>
                     </a>
-                  </Popup>
-                </Marker>
-              )
+
+                    <strong>Are you parking here?</strong>
+                    <div style={{ marginTop: '6px' }}>
+                      <button
+                        onClick={() => {
+                          setParkedSpotId(spot._id);
+                          localStorage.setItem("navigatedSpot", JSON.stringify(spot));
+                          navigate("/status", { state: { parkedSpot: spot } });
+                        }}
+                        style={{ backgroundColor: '#4CAF50', color: 'white', padding: '6px 10px', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%' }}
+                      >
+                        ✅ Yes, I'm parking here
+                      </button>
+                    </div>
+
+                    {!reportedSpots[spot._id] ? (
+                      <>
+                        <strong>Report Status:</strong>
+                        <div style={{ display: 'flex', gap: '10px', margin: '10px 0' }}>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
+                                  hasSpots: true,
+                                  availableSpots: 1,
+                                });
+                                await fetchSpots();
+                                setPoints((prev) => prev + 5);
+                                alert("Thanks! 1 spot marked as available. You earned 5 points.");
+                                setInputVisible(prev => ({ ...prev, [spot._id]: true }));
+                              } catch (error) {
+                                console.error("Error marking spot available:", error);
+                                alert("Failed to update. Please try again.");
+                              }
+                            }}
+                            style={{ flex: 1, backgroundColor: "#4CAF50", color: "white", padding: "6px 10px", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                          >
+                            Spot Available
+                          </button>
+
+                          <button
+                          onClick={async () => {
+                            try {
+                              await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
+                                hasSpots: false,
+                                availableSpots: 0,
+                              });
+                              await fetchSpots();
+                              alert("Thanks! Marked as full.");
+                              setReportedSpots((prev) => ({ ...prev, [spot._id]: true }));
+                            } catch (error) {
+                              console.error("Error marking full:", error);
+                              alert("Failed to update spot.");
+                            }
+                          }}
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            padding: "6px 10px",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          All Full
+                        </button>
+
+                        </div>
+
+                        {inputVisible[spot._id] && (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px' }}>
+                            <input
+                              type="number"
+                              placeholder="Spots"
+                              min="0"
+                              value={freeCounts[spot._id] || ''}
+                              onChange={(e) => setFreeCounts(prev => ({ ...prev, [spot._id]: e.target.value }))}
+                              style={{ width: "60px", padding: "4px", fontSize: "14px" }}
+                            />
+                            <button
+                              onClick={() => handleReportSubmit(spot._id)}
+                              style={{ backgroundColor: "#2196F3", color: "white", border: "none", padding: "4px 10px", borderRadius: "4px", cursor: "pointer" }}
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p style={{ color: "#4CAF50", fontWeight: "500" }}>✔️ Thanks for your input!</p>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
             ))}
           </MarkerClusterGroup>
         </MapContainer>
