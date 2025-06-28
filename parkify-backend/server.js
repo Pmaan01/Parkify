@@ -3,9 +3,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const FreeParking = require("./models/FreeParking"); // Make sure this comes AFTER mongoose connection if using a separate db.js
-const authRoutes = require("./routes/auth");
-
 const app = express();
 app.use(cors());
 app.use(express.json());
