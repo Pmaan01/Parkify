@@ -21,6 +21,7 @@
   position: relative;
 }
 
+
 /* Dark overlay over background */
 .profile-container::before {
   content: '';

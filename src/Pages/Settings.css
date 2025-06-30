@@ -1,0 +1,24 @@
+/* Settings Container */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 0 16px;
+  background-image: url('/profile.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  text-align: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 100%;
+  max-width: 425px;
+  position: relative;
+}
+
+
