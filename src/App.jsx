@@ -10,6 +10,7 @@ import Status from './Pages/Status';
 import MobileContainer from './Pages/MobileContainer'; 
 import Scoreboard from "./Pages/Scoreboard";
 import Settings from './Pages/Settings';
+import EditProfile from './Pages/EditProfile';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/status" element={<Status />} /> 
         <Route path="/scoreboard" element={<Scoreboard />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
 
       </Routes>
     </MobileContainer>
