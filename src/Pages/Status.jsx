@@ -6,6 +6,7 @@ const StatusPage = () => {
   const [spot, setSpot] = useState(null);
   const navigate = useNavigate();
 
+
   useEffect(() => {
     const saved = localStorage.getItem('navigatedSpot');
     if (saved) {

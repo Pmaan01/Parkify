@@ -9,6 +9,11 @@ export default function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Handle navigation click
+  const handleNavClick = (path) => {
+    navigate(path);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -77,13 +82,12 @@ export default function Profile() {
       </div>
 
 
-      <div className="bottom-navbar">
-        <div className="nav-icon" onClick={() => navigate("/home")}><MdHome size={50} /></div>
-        <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>
-        <div className="nav-icon" onClick={() => handleNavClick("/settings")}><MdSettings size={50} /></div>
-        <div className="nav-icon activate" onClick={() => handleNavClick("/profile")}><MdPerson size={50} /></div>
-      </div>
-      
+        <div className="bottom-nav">
+            <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
+            <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>
+            <div className="nav-icon" onClick={() => handleNavClick("/settings")}><MdSettings size={50} /></div>
+            <div className="nav-icon" onClick={() => handleNavClick("/profile")}><MdPerson size={50} /></div>
+        </div>
     </div>
   );
 }
