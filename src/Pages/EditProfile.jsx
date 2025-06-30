@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-//import './EditProfile.css';
+import './EditProfile.css';
 import { MdHome, MdCarRental, MdSettings, MdPerson } from "react-icons/md";
 import { MdArrowBack } from "react-icons/md";
 
