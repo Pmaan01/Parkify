@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Status.css';
 import { useNavigate } from 'react-router-dom';
+import BottomNav from './component/BottomNav';
 
 const StatusPage = () => {
   const [spot, setSpot] = useState(null);
@@ -44,6 +45,8 @@ const StatusPage = () => {
           Open in Google Maps
         </a>
       </div>
+            <BottomNav />
+
     </div>
   );
 };

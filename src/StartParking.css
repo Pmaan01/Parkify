@@ -103,48 +103,6 @@
   margin: 0.5rem 0;
   border-radius: 20px;
 }
-
-/* Bottom Nav Bar */
-.bottom-nav {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  max-width: 425px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(to right, #0d0d18, #1e1e3f);
-  padding: 0.5rem 0;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  box-shadow: 0 -3px 10px rgba(31, 8, 90, 0.6);
-  z-index: 1000;
-}
-
-/* Nav Icons */
-.nav-icon {
-  font-size: 28px;
-  color: #aaa;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 10px;
-  border-radius: 12px;
-}
-
-.nav-icon:hover {
-  transform: scale(1.1);
-  color: #fff;
-}
-
-.nav-icon.active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  box-shadow: 0 0 5px cyan;
-}
-
 /* Responsive for tablets */
 @media (min-width: 600px) {
   .logo {

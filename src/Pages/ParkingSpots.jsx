@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import '../ParkingSpots.css';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import parkifyLogo from '../assets/Parkify-logo.jpg';
-
+import BottomNav from './component/BottomNav'; 
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import availableIcon from '../assets/location.png';
 import unavailableIcon from '../assets/placeholder.png';
@@ -197,7 +197,7 @@ const ParkingSpots = () => {
                   <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
                     <h4>{spot.name}</h4>
                     <p><strong>Type:</strong> {spot.type}</p>
-                    <p><strong>Address:</strong> {spot.address || 'Unknown'}</p>
+                    <p><strong>Address:</strong> {(spot.address && spot.address.trim()) ? spot.address : (spot.area || 'Vancouver')}</p>
                     <p><strong>Rate:</strong> {spot.paid ? (spot.rate || 'Check signage') : 'Free'}</p>
                     <p><strong>Hours:</strong> {spot.paid ? (spot.hours || '9 AM – 10 PM') : (spot.hours || 'Unknown')}</p>
                     <p><strong>Notes:</strong> {spot.notes || 'None'}</p>
@@ -301,12 +301,14 @@ const ParkingSpots = () => {
                             >
                               Submit
                             </button>
+                            
                           </div>
                         )}
                       </>
                     ) : (
                       <p style={{ color: "#4CAF50", fontWeight: "500" }}>✔️ Thanks for your input!</p>
                     )}
+                    
                   </div>
                 </Popup>
               </Marker>
@@ -314,6 +316,7 @@ const ParkingSpots = () => {
           </MarkerClusterGroup>
         </MapContainer>
       </div>
+      <BottomNav />
     </div>
   );
 };
