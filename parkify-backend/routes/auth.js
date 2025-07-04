@@ -26,7 +26,9 @@ router.post("/signup", async (req, res) => {
         const newUser = new User({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            isFirstLogin: true
+
         });
 
         // Save user to the database
@@ -72,7 +74,8 @@ router.post("/login", async (req, res) => {
 
     try {
         // Find user by email
-        const foundUser = await User.findOne({ email });
+        const foundUser = await User.findOne({ email: email.toLowerCase() });
+        console.log("👉 Found user:", foundUser); // Debug log
 
         // If user not found
         if (!foundUser) {
@@ -92,18 +95,35 @@ router.post("/login", async (req, res) => {
             });
         }
 
+
+        // Ensure isFirstLogin is explicitly set
+        const isFirstLogin = foundUser.isFirstLogin !== undefined ? foundUser.isFirstLogin : true;
+        console.log("👉 isFirstLogin for response:", isFirstLogin); // Debug: Log isFirstLogin value
+        
         // Generate JWT token with 1-hour expiry
         const accessToken = jwt.sign(
             {
                 name: foundUser.name,
                 email: foundUser.email,
                 id: foundUser._id,
-                isFirstLogin: foundUser.isFirstLogin
+                isFirstLogin: isFirstLogin
 
             },
             process.env.SECRET_KEY,
             { expiresIn: "1h" }
         );
+
+        // Log response for debugging
+        console.log("👉 Login response:", {
+            token: accessToken,
+            data: {
+                id: foundUser._id,
+                name: foundUser.name,
+                email: foundUser.email,
+                isFirstLogin: isFirstLogin
+            },
+            message: "User successfully logged in."
+        });
 
         // Return token and user info
         return res.status(200).json({
@@ -112,13 +132,14 @@ router.post("/login", async (req, res) => {
                 id: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
-                isFirstLogin: foundUser.isFirstLogin
+                isFirstLogin: isFirstLogin
             },
             message: "User successfully logged in."
         });
 
     } catch (err) {
         // Handle login errors
+         console.error("❌ Login error:", err);
         return res.status(500).json({
             message: "Login error",
             error: err.message
@@ -126,6 +147,14 @@ router.post("/login", async (req, res) => {
     }
 });
 
+
+
+
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Get user profile data
+ * @access  Private
+ */
 
 // Route to get the user's profile data
 router.get("/profile", async (req, res) => {
@@ -175,7 +204,7 @@ debugger;
     // Find the user by the decoded email and update the profile fields
     const updatedUser = await User.findByIdAndUpdate(
         decoded.id ,
-      { name, email, phoneNumber, vehicleNumber, isFirstLogin: false },
+      { name, email: email.toLowerCase(), phoneNumber, vehicleNumber, isFirstLogin: false },
       { new: true, runValidators: true, select: '-password' }
     );
 
