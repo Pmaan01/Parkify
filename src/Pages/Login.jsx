@@ -6,6 +6,7 @@ import './auth.css';
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false); // Added for loading spinner
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -13,6 +14,9 @@ export default function Login() {
             alert("Please enter both email and password.");
             return;
         }
+
+        setLoading(true); // Show loading spinner
+
         try {
             const res = await axios.post("https://parkify-web-app-backend.onrender.com/api/auth/login", {
                 email: email.toLowerCase(), password
@@ -30,6 +34,8 @@ export default function Login() {
         } catch (err) {
             console.error("Login error:", err.response?.data || err.message);
             alert("Login failed. Please check your credentials.");
+        } finally {
+            setLoading(false); // Hide loading spinner
         }
     };
 
@@ -37,6 +43,7 @@ export default function Login() {
         <div className="auth-container">
             <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
             <h2>Welcome back, park without stress.</h2>
+            {loading && <div className="spinner">Loading...</div>} {/* Loading spinner */}
 
             <input
                 type="email"
@@ -51,7 +58,9 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button onClick={handleLogin}>Login</button>
+            <button onClick={handleLogin} disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+            </button>
             <p>New here? <Link to="/signup">Create an account</Link></p>
         </div>
     );

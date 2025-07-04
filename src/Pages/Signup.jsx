@@ -20,7 +20,7 @@ export default function Signup() {
             return;
         }
 
-        setLoading(true);
+        setLoading(true); // Show loading spinner
 
         try {
             const res = await axios.post("https://parkify-web-app-backend.onrender.com/api/auth/signup", {
@@ -43,6 +43,7 @@ export default function Signup() {
         <div className="auth-container">
             <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
             <h2>Sign up now and never circle the block again.</h2>
+            {loading && <div className="spinner">Loading...</div>} {/* Loading spinner */}
 
             <input
                 type="text"
