@@ -175,7 +175,7 @@ debugger;
     // Find the user by the decoded email and update the profile fields
     const updatedUser = await User.findByIdAndUpdate(
         decoded.id ,
-      { name, email, phoneNumber, vehicleNumber },
+      { name, email, phoneNumber, vehicleNumber, isFirstLogin: false },
       { new: true, runValidators: true, select: '-password' }
     );
 
