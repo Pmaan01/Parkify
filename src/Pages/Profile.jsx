@@ -7,7 +7,7 @@ import { MdHome, MdCarRental, MdSettings, MdPerson } from "react-icons/md";
 export default function Profile() {
   const [user, setUser] = useState({ name: '', email: '', phoneNumber: '', vehicleNumber: '' });
   const[isFirstLogin, setIsFirstLogin] = useState(true);
-  const [showNavbar, setShowNavbar] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
   const navigate = useNavigate();
   //const location = useLocation();
 
@@ -18,13 +18,14 @@ export default function Profile() {
 
       try {
 
-          // Decode token to get isFirstLogin
+          /*// Decode token to get isFirstLogin
           const decoded = JSON.parse(atob(token.split('.')[1]));
           console.log("Decoded token:", decoded);
           const firstLogin = decoded.isFirstLogin !== undefined ? decoded.
           isFirstLogin : true;
           setIsFirstLogin(firstLogin);
           setShowNavbar(!firstLogin); // Show navbar if not first login
+          */
 
           //Fetch user profile
           axios.get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
@@ -37,6 +38,11 @@ export default function Profile() {
                 phoneNumber: res.data.phoneNumber || '', 
                 vehicleNumber: res.data.vehicleNumber || '' 
             });
+
+            const firstLogin = res.data.isFirstLogin !== undefined ? res.data.
+            isFirstLogin : true;
+            setIsFirstLogin(firstLogin);
+            setShowNavbar(!firstLogin || (res.data.phoneNumber && res.data.vehicleNumber)); // Show navbar unless first login and profile incomplete
         }).catch(err => {
             console.error('Error fetching profile:', err.response?.data || err.message);
             alert('Failed to load profile.');
@@ -60,14 +66,16 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-         await axios.put('https://parkify-web-app-backend.onrender.com/api/auth/profile', user, {
+         const res = await axios.put('https://parkify-web-app-backend.onrender.com/api/auth/profile', user, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        console.log("Profile update response:", res.data);
         alert('Profile saved successfully!');
-        if (isFirstLogin) {
-          setShowNavbar(true); // Show navbar after saving
-          setIsFirstLogin(false); // Update local state
-        }
+      
+        setIsFirstLogin(false); // Update local state
+        setShowNavbar(true); // Show navbar after saving
+        
+        
         navigate('/home'); // Redirect to StartParking after saving
       } catch (err) {
         console.error('Error saving profile:', err.response ? err.response.data : err.message);
@@ -87,7 +95,7 @@ export default function Profile() {
     <div className="profile-container">
       <div className="profile-content">
         <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
-        <h2>{isFirstLogin ? "Your Profile is incomplete" : "Edit your profile"}</h2>
+        <h2>{isFirstLogin && !(user.phoneNumber && user.vehicleNumber)? "Your Profile is incomplete" : "Edit your profile"}</h2>
         <input
           type="text"
           placeholder="Name"
@@ -116,7 +124,7 @@ export default function Profile() {
       </div>
 
 
-        {showNavbar &&(
+        {showNavbar && (
         <div className="bottom-nav">
             <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
             <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>

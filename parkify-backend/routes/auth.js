@@ -97,7 +97,8 @@ router.post("/login", async (req, res) => {
 
 
         // Ensure isFirstLogin is explicitly set
-        const isFirstLogin = foundUser.isFirstLogin !== undefined ? foundUser.isFirstLogin : true;
+        const isFirstLogin = foundUser.isFirstLogin !== undefined ? foundUser.
+        isFirstLogin : true;
         console.log("👉 isFirstLogin for response:", isFirstLogin); // Debug: Log isFirstLogin value
         
         // Generate JWT token with 1-hour expiry
@@ -173,6 +174,8 @@ router.get("/profile", async (req, res) => {
     // Exclude the password field from the returned user object
     const user = await User.findOne({ email: decoded.email }).select('-password');
 
+    console.log("👉 Profile fetched:", user); // Debug log
+
     // If user not found, respond with 404
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -188,7 +191,6 @@ router.get("/profile", async (req, res) => {
 // Route to update the user's profile information
 router.put("/profile", async (req, res) => {
     console.log(req.body, "Show Success ")
-debugger;
      // Extract the token from the Authorization header (format: "Bearer <token>")
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
@@ -208,12 +210,15 @@ debugger;
       { new: true, runValidators: true, select: '-password' }
     );
 
+
+    console.log("👉 Updated user:", updatedUser); // Debug log
      // If no user is found with that email, return a not found error
     if (!updatedUser) return res.status(404).json({ message: "User not found" });
     
     // Send back a success message with the updated user data
     res.status(200).json({ message: "Profile updated successfully", data: updatedUser });
-  } catch (err) {
+  
+} catch (err) {
 
     // Catch any errors (e.g. invalid token, DB errors) and return a 500 error
     res.status(500).json({ message: "Error updating profile", error: err.message });
