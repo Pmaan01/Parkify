@@ -16,7 +16,7 @@ export default function Login() {
 
         try {
             const res = await axios.post("https://parkify-web-app-backend.onrender.com/api/auth/login", {
-                email, password
+                email: email.toLowerCase(), password
             });
             alert("Login successful!");
             // Store the token in localStorage
