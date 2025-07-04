@@ -150,6 +150,25 @@ router.post("/login", async (req, res) => {
 
 
 
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Log out user by clearing token
+ * @access  Private
+ */
+router.post("/logout", async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  try {
+    // Optionally, you can blacklist the token in a database or Redis
+    // For now, just return a success message
+    res.status(200).json({ message: "Successfully logged out" });
+  } catch (err) {
+    res.status(500).json({ message: "Logout failed", error: err.message });
+  }
+});
 
 /**
  * @route   GET /api/auth/profile
