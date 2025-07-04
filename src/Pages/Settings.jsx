@@ -13,7 +13,7 @@ export default function Settings() {
 
   // Array of settings options (only 'Edit Profile' has a path right now)
   const settingsOptions = [
-    { label: 'Edit Profile', path: '/edit-profile' },
+    
     { label: 'Change Password', path: null },
     { label: 'Delete Account', path: null },
     { label: 'Notifications', path: null },

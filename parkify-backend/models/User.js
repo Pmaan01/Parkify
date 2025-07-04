@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
   password: String,
   name: String,
   phoneNumber: String,
-  vehicleNumber: String
+  vehicleNumber: String,
+  isFirstLogin: { type: Boolean, default: true }
 
   // other fields
 });

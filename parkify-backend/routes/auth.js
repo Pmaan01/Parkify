@@ -97,7 +97,8 @@ router.post("/login", async (req, res) => {
             {
                 name: foundUser.name,
                 email: foundUser.email,
-                id: foundUser._id
+                id: foundUser._id,
+                isFirstLogin: foundUser.isFirstLogin
 
             },
             process.env.SECRET_KEY,
@@ -110,7 +111,8 @@ router.post("/login", async (req, res) => {
             data: {
                 id: foundUser._id,
                 name: foundUser.name,
-                email: foundUser.email
+                email: foundUser.email,
+                isFirstLogin: foundUser.isFirstLogin
             },
             message: "User successfully logged in."
         });
