@@ -51,6 +51,14 @@ const ParkingSpots = () => {
   const [freeCounts, setFreeCounts] = useState({});
   const [parkedSpotId, setParkedSpotId] = useState(null);
   const navigate = useNavigate();
+  const [lastAction, setLastAction] = useState({});
+  const [successMessage, setSuccessMessage] = useState({});
+  const [confirmedSpots, setConfirmedSpots] = useState({});
+  const [timer, setTimer] = useState({});
+  const [activeSpotId, setActiveSpotId] = useState(null);
+
+
+
 
   const query = new URLSearchParams(useLocation().search);
   const selectedArea = query.get("location") || "All";
@@ -191,10 +199,22 @@ const ParkingSpots = () => {
               html: `<div style="background:#007bff;color:#fff;font-size:13px;font-weight:bold;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">${cluster.getChildCount()}</div>`
             });
           }}>
-            {filteredSpots.map((spot, index) => (
-              <Marker key={index} position={[spot.latitude, spot.longitude]} icon={getMarkerIcon(spot)}>
-                <Popup>
-                  <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
+                    {filteredSpots.map((spot, index) => (
+                    <Marker
+                      key={spot._id}
+                      position={[spot.latitude, spot.longitude]}
+                      icon={getMarkerIcon(spot)}
+                      eventHandlers={{
+                        click: () => setActiveSpotId(spot._id),
+                      }}
+                    >
+                    <Popup
+                      autoClose={false}
+                      autoPan={false}
+                      closeOnClick={false}
+                      onClose={() => setActiveSpotId(null)}a
+                    >
+                      <div style={{ display: activeSpotId === spot._id ? 'block' : 'none' }}>
                     <h4>{spot.name}</h4>
                     <p><strong>Type:</strong> {spot.type}</p>
                     <p><strong>Address:</strong> {(spot.address && spot.address.trim()) ? spot.address : (spot.area || 'Vancouver')}</p>
@@ -216,94 +236,197 @@ const ParkingSpots = () => {
                       </button>
                     </a>
 
-                    <strong>Are you parking here?</strong>
-                    <div style={{ marginTop: '6px' }}>
-                      <button
-                        onClick={() => {
-                          setParkedSpotId(spot._id);
-                          localStorage.setItem("navigatedSpot", JSON.stringify(spot));
-                          navigate("/status", { state: { parkedSpot: spot } });
-                        }}
-                        style={{ backgroundColor: '#4CAF50', color: 'white', padding: '6px 10px', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%' }}
-                      >
-                        ✅ Yes, I'm parking here
-                      </button>
-                    </div>
-
-                    {!reportedSpots[spot._id] ? (
-                      <>
-                        <strong>Report Status:</strong>
-                        <div style={{ display: 'flex', gap: '10px', margin: '10px 0' }}>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
-                                  hasSpots: true,
-                                  availableSpots: 1,
-                                });
-                                await fetchSpots();
-                                setPoints((prev) => prev + 5);
-                                alert("Thanks! 1 spot marked as available. You earned 5 points.");
-                                setInputVisible(prev => ({ ...prev, [spot._id]: true }));
-                              } catch (error) {
-                                console.error("Error marking spot available:", error);
-                                alert("Failed to update. Please try again.");
-                              }
-                            }}
-                            style={{ flex: 1, backgroundColor: "#4CAF50", color: "white", padding: "6px 10px", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                          >
-                            Spot Available
-                          </button>
-
-                          <button
-                          onClick={async () => {
-                            try {
-                              await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
-                                hasSpots: false,
-                                availableSpots: 0,
-                              });
-                              await fetchSpots();
-                              alert("Thanks! Marked as full.");
-                              setReportedSpots((prev) => ({ ...prev, [spot._id]: true }));
-                            } catch (error) {
-                              console.error("Error marking full:", error);
-                              alert("Failed to update spot.");
-                            }
-                          }}
+                            {confirmedSpots[spot._id] ? (
+                        <button
+                          disabled
                           style={{
-                            flex: 1,
-                            backgroundColor: "#f44336",
-                            color: "white",
-                            padding: "6px 10px",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            padding: '6px 10px',
+                            border: 'none',
+                            borderRadius: '4px',
+                            width: '100%',
+                            fontWeight: 'bold',
+                            marginTop: '8px',
                           }}
                         >
-                          All Full
+                          ⏳ Parking confirmed: {Math.floor(timer[spot._id] / 60)}:
+                          {(timer[spot._id] % 60).toString().padStart(2, '0')}
                         </button>
+                      ) : (
+                        <div style={{ marginTop: '6px' }}>
+                          <strong>Are you parking here?</strong>
+                          <button
+                            onClick={() => {
+                              setConfirmedSpots(prev => ({ ...prev, [spot._id]: true }));
+                              setTimer(prev => ({ ...prev, [spot._id]: 3600 })); // 1 hour (in seconds)
 
+                              // Start timer
+                              const interval = setInterval(() => {
+                                setTimer(prev => {
+                                  const updated = { ...prev };
+                                  if (updated[spot._id] > 0) {
+                                    updated[spot._id] -= 1;
+                                  } else {
+                                    clearInterval(interval);
+                                  }
+                                  return updated;
+                                });
+                              }, 1000);
+
+                              // Redirect to Stripe (open in new tab for now)
+                              window.open("https://your-stripe-checkout-url.com", "_blank");
+                            }}
+                            style={{
+                              backgroundColor: '#4CAF50',
+                              color: 'white',
+                              padding: '6px 10px',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              width: '100%',
+                            }}
+                          >
+                            Yes, I’m parking here
+                          </button>
                         </div>
+                      )}
 
-                        {inputVisible[spot._id] && (
-                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px' }}>
-                            <input
-                              type="number"
-                              placeholder="Spots"
-                              min="0"
-                              value={freeCounts[spot._id] || ''}
-                              onChange={(e) => setFreeCounts(prev => ({ ...prev, [spot._id]: e.target.value }))}
-                              style={{ width: "60px", padding: "4px", fontSize: "14px" }}
-                            />
-                            <button
-                              onClick={() => handleReportSubmit(spot._id)}
-                              style={{ backgroundColor: "#2196F3", color: "white", border: "none", padding: "4px 10px", borderRadius: "4px", cursor: "pointer" }}
-                            >
-                              Submit
-                            </button>
-                            
-                          </div>
-                        )}
+
+
+
+                    {!reportedSpots[spot._id] ? (
+                                      <>
+                        {successMessage[spot._id] && (
+                    <p style={{ color: "#4CAF50", fontWeight: "bold", margin: "6px 0" }}>
+                      {successMessage[spot._id]}
+                    </p>
+                  )}
+
+                  <strong>Report Status:</strong>
+                  <div style={{ display: 'flex', gap: '10px', margin: '10px 0' }}>
+                    {lastAction[spot._id] !== "available" && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
+                              hasSpots: true,
+                              availableSpots: 1,
+                            });
+                            await fetchSpots();
+                            setPoints((prev) => prev + 5);
+                            setInputVisible(prev => ({ ...prev, [spot._id]: true }));
+                            setLastAction(prev => ({ ...prev, [spot._id]: "available" }));
+                            setSuccessMessage(prev => ({
+                              ...prev,
+                              [spot._id]: `🟢 Spot marked available! You earned 5 points.`,
+                            }));
+                            setTimeout(() => {
+                              setSuccessMessage(prev => ({ ...prev, [spot._id]: null }));
+                            }, 4000);
+                          } catch (error) {
+                            console.error("Error marking spot available:", error);
+                            setSuccessMessage(prev => ({
+                              ...prev,
+                              [spot._id]: "❌ Could not mark as available. Try again.",
+                            }));
+                          }
+                        }}
+                        style={{
+                          flex: 1,
+                          backgroundColor: "#4CAF50",
+                          color: "white",
+                          padding: "6px 10px",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Spot Available
+                      </button>
+                    )}
+
+                    {lastAction[spot._id] !== "full" && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
+                              hasSpots: false,
+                              availableSpots: 0,
+                            });
+                            await fetchSpots();
+                            setLastAction(prev => ({ ...prev, [spot._id]: "full" }));
+                            setSuccessMessage(prev => ({
+                              ...prev,
+                              [spot._id]: "🔴 Spot marked as full.",
+                            }));
+                            setTimeout(() => {
+                              setSuccessMessage(prev => ({ ...prev, [spot._id]: null }));
+                            }, 4000);
+                          } catch (error) {
+                            console.error("Error marking full:", error);
+                            setSuccessMessage(prev => ({
+                              ...prev,
+                              [spot._id]: "❌ Could not mark full. Try again.",
+                            }));
+                          }
+                        }}
+                        style={{
+                          flex: 1,
+                          backgroundColor: "#f44336",
+                          color: "white",
+                          padding: "6px 10px",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        All Full
+                      </button>
+                    )}
+                  </div>
+
+                  {inputVisible[spot._id] && (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px' }}>
+                      <input
+                        type="number"
+                        placeholder="Spots"
+                        min="0"
+                        value={freeCounts[spot._id] || ''}
+                        onChange={(e) =>
+                          setFreeCounts(prev => ({ ...prev, [spot._id]: e.target.value }))
+                        }
+                        style={{ width: "60px", padding: "4px", fontSize: "14px" }}
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReportSubmit(spot._id);
+                          setSuccessMessage(prev => ({
+                            ...prev,
+                            [spot._id]: `✅ You submitted ${freeCounts[spot._id]} spot(s). Keep helping!`,
+                          }));
+                          setTimeout(() => {
+                            setSuccessMessage(prev => ({ ...prev, [spot._id]: null }));
+                          }, 4000);
+                        }}
+                        style={{
+                          backgroundColor: "#2196F3",
+                          color: "white",
+                          border: "none",
+                          padding: "4px 10px",
+                          borderRadius: "4px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  )}
+
+
                       </>
                     ) : (
                       <p style={{ color: "#4CAF50", fontWeight: "500" }}>✔️ Thanks for your input!</p>
