@@ -16,12 +16,18 @@ mongoose.connect(process.env.MONGO_URI)
 const FreeParking = require("./models/FreeParking");
 const authRoutes = require("./routes/auth");
 const scoreRoutes = require("./routes/score");
+const confirmedParkingRoutes = require('./routes/confirmedParkingRoutes');
+
+app.use(express.json());
 
 // ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/score", scoreRoutes);
+app.use('/api/confirmed-parking', confirmedParkingRoutes);
+
 console.log("scoreRoutes =", scoreRoutes);
 console.log("typeof scoreRoutes =", typeof scoreRoutes);
+console.log("✅ ConfirmedParking route mounted at /api/confirmed-parking");
 
 
 // ✅ GET all parking spots
@@ -57,6 +63,10 @@ app.put("/api/free-parking/:id", async (req, res) => {
     console.error("PUT error:", err);
     res.status(500).json({ error: "Failed to update parking spot" });
   }
+});
+app.use((req, res, next) => {
+  console.warn(`🚫 Unknown route hit: ${req.method} ${req.originalUrl}`);
+  res.status(404).send('Not Found');
 });
 
 // ✅ Start Server
