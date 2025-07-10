@@ -15,6 +15,7 @@ import currentIcon from '../assets/pin.png';
 import MapHelper from './component/MapHelper';
 import MapClickCloser from './component/MapClickCloser';
 import ParkingTimer from './component/ParkingTimer';
+import { handleStripePayment } from './component/stripePayment';
 
 
 const blueIcon = new L.Icon({
@@ -505,45 +506,7 @@ const ParkingSpots = () => {
                   <strong>Are you parking here?</strong>
                   {spot.hasSpots ? (
                     <button
-                      onClick={async () => {
-                        setParkedSpotId(spot._id);
-                        setConfirmedSpots(prev => ({ ...prev, [spot._id]: true }));
-                        localStorage.setItem("confirmedSpotId", spot._id);
-
-                        // ⏳ Save start time right away so timer works instantly
-                        const storageKey = `parkingStart_${spot._id}`;
-                        if (!localStorage.getItem(storageKey)) {
-                          localStorage.setItem(storageKey, Date.now().toString());
-                        }
-
-                        if (spot.availableSpots > 0) {
-                          try {
-                            await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${spot._id}`, {
-                              hasSpots: spot.availableSpots - 1 > 0,
-                              availableSpots: spot.availableSpots - 1,
-                            });
-                            await fetchSpots();
-                          } catch (err) {
-                            console.error("Failed to update spot after parking", err);
-                          }
-                        }
-
-                        try {
-                          await axios.post("https://parkify-web-app-backend.onrender.com/api/confirmed-parking", {
-                            spotId: spot._id,
-                            spotName: spot.name,
-                            address: spot.address,
-                            latitude: spot.latitude,
-                            longitude: spot.longitude,
-                            duration: 3600
-                          });
-                        } catch (err) {
-                          console.error("Failed to save confirmation history", err);
-                        }
-
-                        alert("Thanks! You're now parked. Timer started.");
-                      }}
-
+                      onClick={() => handleStripePayment(spot)}
                       disabled={!!parkedSpotId && parkedSpotId !== spot._id}
                       style={{
                         backgroundColor: '#4CAF50',
@@ -563,6 +526,8 @@ const ParkingSpots = () => {
                       ❌ Spot marked as full. Please mark it as available to confirm parking.
                     </p>
                   )}
+
+
                 </div>
               )}
 

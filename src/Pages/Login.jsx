@@ -21,13 +21,15 @@ export default function Login() {
             const res = await axios.post("https://parkify-web-app-backend.onrender.com/api/auth/login", {
                 email: email.toLowerCase(), password
             });
-            
+
 
             console.log("Login response:", res.data); // Debug log
             // Store the token in localStorage
             localStorage.setItem('token', res.data.token);
+            localStorage.setItem("userId", res.data.data.id);
+
             const isFirstLogin = res.data.data.isFirstLogin !== undefined ? res.data.
-            data.isFirstLogin : true;
+                data.isFirstLogin : true;
             console.log("isFirstLogin:", isFirstLogin); // Debug log
             alert("Login successful!");
             navigate(isFirstLogin ? "/profile" : "/home");
@@ -43,7 +45,7 @@ export default function Login() {
         <div className="auth-container">
             <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
             <h2>Welcome back, park without stress.</h2>
-            {loading && <div className="spinner">Loading...</div>} {/* Loading spinner */}
+            {loading && <div className="spinner"></div>}
 
             <input
                 type="email"

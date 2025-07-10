@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const confirmedParkingSchema = new mongoose.Schema({
-  userId: String,
+  userId: { type: String, required: true },
   spotId: String,
   spotName: String,
   address: String,

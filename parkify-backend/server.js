@@ -17,6 +17,8 @@ const FreeParking = require("./models/FreeParking");
 const authRoutes = require("./routes/auth");
 const scoreRoutes = require("./routes/score");
 const confirmedParkingRoutes = require('./routes/confirmedParkingRoutes');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const checkoutRoutes = require("./routes/checkoutSession");
 
 app.use(express.json());
 
@@ -28,6 +30,7 @@ app.use('/api/confirmed-parking', confirmedParkingRoutes);
 console.log("scoreRoutes =", scoreRoutes);
 console.log("typeof scoreRoutes =", typeof scoreRoutes);
 console.log("✅ ConfirmedParking route mounted at /api/confirmed-parking");
+app.use("/api", checkoutRoutes);
 
 
 // ✅ GET all parking spots

@@ -11,7 +11,10 @@ const Status = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/confirmed-parking");
+        const userId = localStorage.getItem("userId");
+        const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/confirmed-parking", {
+          params: { userId }
+        });
         const allHistory = res.data;
 
         const confirmedSpotId = localStorage.getItem("confirmedSpotId");
@@ -33,11 +36,62 @@ const Status = () => {
           : allHistory;
 
         setHistory(filteredHistory);
+
+        console.log("✅ Fetching history for user:", userId);
+        console.log("📦 Received records:", allHistory);
+
       } catch (err) {
         console.error("Failed to load history", err);
       }
     };
 
+    // ✅ Handle Stripe redirect confirmation
+    const handleStripeSuccess = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("success") === "true") {
+        // Give time for localStorage to update
+        setTimeout(async () => {
+          const pending = localStorage.getItem("pendingStripeSpot");
+          if (pending) {
+            const spot = JSON.parse(pending);
+            const storageKey = `parkingStart_${spot._id}`;
+
+            localStorage.setItem("confirmedSpotId", spot._id);
+            localStorage.setItem(storageKey, Date.now().toString());
+
+            setActiveSession({
+              userId: localStorage.getItem("userId"), spotId: spot._id,
+              spotName: spot.name,
+              address: spot.address,
+              latitude: spot.latitude,
+              longitude: spot.longitude,
+              duration: 3600,
+
+            });
+
+            try {
+              await axios.post("https://parkify-web-app-backend.onrender.com/api/confirmed-parking", {
+                userId: localStorage.getItem("userId"),
+                spotId: spot._id,
+                spotName: spot.name,
+                address: spot.address,
+                latitude: spot.latitude,
+                longitude: spot.longitude,
+                duration: 3600,
+              });
+            } catch (err) {
+              console.error("❌ Failed to save confirmed session after Stripe", err);
+            }
+
+            localStorage.removeItem("pendingStripeSpot");
+            window.history.replaceState({}, document.title, "/status");
+          }
+        }, 500); // ⏳ Wait 0.5 seconds
+      }
+    };
+
+
+    handleStripeSuccess();
     fetchHistory();
   }, []);
 
@@ -75,43 +129,40 @@ const Status = () => {
     const secs = totalSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-const handleEndParking = async () => {
-  const confirmedSpotId = localStorage.getItem("confirmedSpotId");
-  const startTime = localStorage.getItem(`parkingStart_${confirmedSpotId}`);
 
-  if (!confirmedSpotId || !activeSession) return;
+  const handleEndParking = async () => {
+    const confirmedSpotId = localStorage.getItem("confirmedSpotId");
 
-  try {
-    // 1. Mark spot as available again
-    await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${confirmedSpotId}`, {
-      hasSpots: true,
-      $inc: { hasSpots: 1 }  
-    });
+    if (!confirmedSpotId || !activeSession) return;
 
-    // 2. Clear localStorage
-    localStorage.removeItem("confirmedSpotId");
-    localStorage.removeItem(`parkingStart_${confirmedSpotId}`);
+    try {
 
-    // 3. Move session to history
-    setHistory((prev) => [activeSession, ...prev]);
-    setActiveSession(null);
-    setRemainingTime(null);
+      await axios.put(`https://parkify-web-app-backend.onrender.com/api/free-parking/${confirmedSpotId}`, {
+        hasSpots: true,
+        availableSpots: 1
+      });
 
-    // 4. Refresh from backend for accuracy
-    const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/confirmed-parking");
-    const allHistory = res.data;
+      localStorage.removeItem("confirmedSpotId");
+      localStorage.removeItem(`parkingStart_${confirmedSpotId}`);
 
-    const filteredHistory = allHistory.filter(entry =>
-      entry.spotId !== confirmedSpotId
-    );
+      setActiveSession(null);
+      setRemainingTime(null);
 
-    setHistory(filteredHistory);
-  } catch (err) {
-    console.error("Failed to end parking and update spot", err);
-    alert("Something went wrong while ending your parking session.");
-  }
-};
+      try {
+        const res = await axios.get("https://parkify-web-app-backend.onrender.com/api/confirmed-parking", {
+          params: { userId: localStorage.getItem("userId") }
+          
+        });
+        setHistory(res.data);
+      } catch (err) {
+        console.error("❌ Failed to reload history after ending session", err);
+      }
 
+    } catch (err) {
+      console.error("Failed to end parking and update spot", err);
+      alert("Something went wrong while ending your parking session.");
+    }
+  };
 
   return (
     <div className="status-container">

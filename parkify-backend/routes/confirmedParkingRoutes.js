@@ -18,15 +18,28 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET route
 router.get('/', async (req, res) => {
   try {
-    const records = await ConfirmedParking.find().sort({ confirmedAt: -1 });
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId in query params." });
+    }
+
+    console.log("🔍 Filtering records for userId:", userId);
+
+    const records = await ConfirmedParking.find({ userId: String(userId) }).sort({ confirmedAt: -1 });
+
+    // 🔍 Print each record’s userId
+    records.forEach((r, i) => console.log(`Record ${i + 1}: userId =`, r.userId));
+
     res.status(200).json(records);
   } catch (err) {
-    console.error("❌ GET failed in confirmedParkingRoutes:", err);
+    console.error("GET failed in confirmedParkingRoutes:", err);
     res.status(500).json({ error: 'Failed to retrieve history.' });
   }
 });
+
+
 
 module.exports = router;
