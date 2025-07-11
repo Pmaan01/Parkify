@@ -2,14 +2,23 @@ const express = require("express");
 const router = express.Router();
 const Score = require("../models/Score");
 
-router.get("/top", async (req, res) => {
-    try {
-        const topScores = await Score.find().sort({ score: -1 }).limit(10);
-        res.json(topScores);
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching scores" });
-    }
-});
+const topScores = await Score.aggregate([
+    {
+        $group: {
+            _id: { email: "$email", username: "$username" },
+            totalScore: { $sum: "$score" }
+        }
+    },
+    { $sort: { totalScore: -1 } },
+    { $limit: 10 }
+]);
+
+res.json(topScores.map(user => ({
+    _id: user._id.email,
+    username: user._id.username,
+    score: user.totalScore
+})));
+
 
 //to record each point-earning action
 router.post("/add", async (req, res) => {
