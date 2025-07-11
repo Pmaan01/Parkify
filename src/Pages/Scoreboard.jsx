@@ -29,7 +29,7 @@ export default function Scoreboard() {
                 {scores.map((user, index) => (
                     <li key={user._id} className={`score-item ${index < 3 ? 'top-three' : ''}`}>
                         <span className="rank">{index + 1}.</span>
-                        <span className="name">{user.displayName}</span>
+                        <span className="name">{user.username}</span>
                         <span className="points">{user.score} pts</span>
                         {index < 3 && <span className="badge">{["🥇", "🥈", "🥉"][index]}</span>}
                     </li>
