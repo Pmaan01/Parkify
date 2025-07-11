@@ -11,4 +11,18 @@ router.get("/top", async (req, res) => {
     }
 });
 
+//to record each point-earning action
+router.post("/add", async (req, res) => {
+    const { email, username, score, action } = req.body;
+
+    try {
+        const newScore = new Score({ email, username, score, action });
+        await newScore.save();
+        res.status(201).json({ message: "Score saved successfully" });
+    } catch (err) {
+        res.status(500).json({ error: "Error saving score" });
+    }
+});
+
+
 module.exports = router;
