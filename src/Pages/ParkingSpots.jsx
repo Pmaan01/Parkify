@@ -45,6 +45,8 @@ const userIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+
+
 const ParkingSpots = () => {
   const [allSpots, setAllSpots] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
@@ -91,6 +93,24 @@ const ParkingSpots = () => {
     fetchSpots();
   }, []);
 
+  const submitPoints = async (points, action) => {
+    const email = localStorage.getItem("email");
+    const username = localStorage.getItem("username");
+    if (!email || !username) return;
+
+    try {
+      await axios.post("https://parkify-web-app-backend.onrender.com/api/score/add", {
+        email,
+        username,
+        score: points,
+        action
+      });
+    } catch (err) {
+      console.error("Error submitting score", err);
+    }
+  };
+
+
   const filteredSpots = allSpots
     .filter((spot) => {
       if (!spot.latitude || !spot.longitude) return false;
@@ -119,15 +139,20 @@ const ParkingSpots = () => {
           availableSpots: num,
         });
         await fetchSpots();
-        setPoints((prev) => prev + num * 5);
+        const earned = num * 5;
+        setPoints((prev) => prev + earned);
         setReportedSpots((prev) => ({ ...prev, [spotId]: true }));
-        alert(`Thanks! You earned ${num * 5} points.`);
+        submitPoints(earned, "multi_spot_report");
+        alert(`Thanks! You earned ${earned} points.`);
       } catch (error) {
         console.error("Error updating spot:", error);
         alert("Failed to update spot.");
       }
     }
   };
+
+
+
 
   return (
     <div className="spots-container">
@@ -308,6 +333,9 @@ const ParkingSpots = () => {
                             setReportedSpots((prev) => ({ ...prev, [spot._id]: true }));
                             setFreeCounts((prev) => ({ ...prev, [spot._id + "_confirmed"]: true }));
                             setPoints((prev) => prev + 5);
+                            //Give 5 points
+                            submitPoints(5, "spot_available");
+
                             alert("Thanks! 1 spot added. You earned 5 points.");
                           } catch (err) {
                             alert("Error updating spot.");
@@ -421,6 +449,9 @@ const ParkingSpots = () => {
                               await fetchSpots();
                               alert("Thanks! Spot marked as full.");
                               setReportedSpots((prev) => ({ ...prev, [spot._id]: true }));
+                              // 5 points for reporting full meaked
+                              submitPoints(5, "marked_full");
+
                             } catch (err) {
                               alert("Failed to report full status.");
                               console.error(err);
@@ -506,7 +537,11 @@ const ParkingSpots = () => {
                   <strong>Are you parking here?</strong>
                   {spot.hasSpots ? (
                     <button
-                      onClick={() => handleStripePayment(spot)}
+                      onClick={async () => {
+                        await handleStripePayment(spot);
+                        submitPoints(2, "parking_confirmed");
+                      }}
+
                       disabled={!!parkedSpotId && parkedSpotId !== spot._id}
                       style={{
                         backgroundColor: '#4CAF50',
