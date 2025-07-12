@@ -5,6 +5,8 @@ const Score = require("../models/Score");
 //  GET /top - Return top 10 users by total score
 router.get("/top", async (req, res) => {
     try {
+        //For debugging
+        console.log("📤 Fetching top scores...");
         const topScores = await Score.aggregate([
             {
                 $group: {
@@ -15,6 +17,8 @@ router.get("/top", async (req, res) => {
             { $sort: { totalScore: -1 } },
             { $limit: 10 }
         ]);
+
+        console.log("✅ Top scores calculated:", topScores);
 
         res.json(topScores.map(user => ({
             _id: user._id.email,
@@ -30,11 +34,20 @@ router.get("/top", async (req, res) => {
 router.post("/add", async (req, res) => {
     const { email, username, score, action } = req.body;
 
+    //For debugging
+    console.log("📥 Incoming score submission:");
+    console.log("Email:", email);
+    console.log("Username:", username);
+    console.log("Score:", score);
+    console.log("Action:", action);
+
     try {
         const newScore = new Score({ email, username, score, action });
         await newScore.save();
+        console.log("✅ Score saved successfully to MongoDB");
         res.status(201).json({ message: "Score saved successfully" });
     } catch (err) {
+        console.error("❌ Error saving score:", err);
         res.status(500).json({ error: "Error saving score" });
     }
 });

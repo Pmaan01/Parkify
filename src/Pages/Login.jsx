@@ -27,7 +27,10 @@ export default function Login() {
             // Store the token in localStorage
             localStorage.setItem('token', res.data.token);
             localStorage.setItem("userId", res.data.data.id);
+            localStorage.setItem("email", res.data.data.email);
+            localStorage.setItem("username", res.data.data.name);
 
+            console.log(res.data.data.email, res.data.data.name)
             const isFirstLogin = res.data.data.isFirstLogin !== undefined ? res.data.
                 data.isFirstLogin : true;
             console.log("isFirstLogin:", isFirstLogin); // Debug log

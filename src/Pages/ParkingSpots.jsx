@@ -96,15 +96,27 @@ const ParkingSpots = () => {
   const submitPoints = async (points, action) => {
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
-    if (!email || !username) return;
+
+    //For debugging
+    console.log("📨 Submitting points...");
+    console.log("Email:", email);
+    console.log("Username:", username);
+    console.log("Points:", points);
+    console.log("Action:", action);
+
+    if (!email || !username) {
+      console.warn("⚠️ Missing email or username in localStorage.");
+      return;
+    }
 
     try {
-      await axios.post("https://parkify-web-app-backend.onrender.com/api/score/add", {
+      const res = await axios.post("http://localhost:5000/api/score/add", {
         email,
         username,
         score: points,
         action
       });
+      console.log("✅ Points submitted successfully:", res.data);
     } catch (err) {
       console.error("Error submitting score", err);
     }
