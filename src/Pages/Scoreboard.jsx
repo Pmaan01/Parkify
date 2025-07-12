@@ -9,10 +9,17 @@ export default function Scoreboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("https://parkify-web-app-backend.onrender.com/api/score/top")
-            .then(res => setScores(res.data))
-            .catch(err => console.error("Error fetching scores", err));
+        console.log("📤 Fetching top scores from backend...");
+        axios.get("http://localhost:5000/api/score/top")
+            .then(res => {
+                console.log("✅ Received scores:", res.data);
+                setScores(res.data);
+            })
+            .catch(err => {
+                console.error("❌ Error fetching scores", err);
+            });
     }, []);
+
 
 
     return (
@@ -29,7 +36,7 @@ export default function Scoreboard() {
                 {scores.map((user, index) => (
                     <li key={user._id} className={`score-item ${index < 3 ? 'top-three' : ''}`}>
                         <span className="rank">{index + 1}.</span>
-                        <span className="name">{user.displayName}</span>
+                        <span className="name">{user.username}</span>
                         <span className="points">{user.score} pts</span>
                         {index < 3 && <span className="badge">{["🥇", "🥈", "🥉"][index]}</span>}
                     </li>
