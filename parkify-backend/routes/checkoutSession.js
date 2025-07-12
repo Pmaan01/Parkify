@@ -21,8 +21,8 @@ router.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "parkify-web-app-xi.vercel.app/status?success=true",
-      cancel_url: "parkify-web-app-xi.vercel.app/status?canceled=true",
+      success_url: "https://parkify-web-app-xi.vercel.app/status?success=true",
+      cancel_url: "https://parkify-web-app-xi.vercel.app/status?canceled=true",
     });
 
     res.json({ url: session.url });
