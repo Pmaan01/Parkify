@@ -8,7 +8,9 @@ const confirmedParkingSchema = new mongoose.Schema({
   latitude: Number,
   longitude: Number,
   duration: { type: Number, default: 3600 }, // in seconds
-  confirmedAt: { type: Date, default: Date.now }
+  confirmedAt: { type: Date, default: Date.now },
+  endsAt: Date, 
+  isActive: { type: Boolean, default: true },
 });
 
 module.exports = mongoose.model('ConfirmedParking', confirmedParkingSchema);

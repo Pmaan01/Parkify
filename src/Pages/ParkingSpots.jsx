@@ -64,13 +64,40 @@ const ParkingSpots = () => {
 
   const query = new URLSearchParams(useLocation().search);
   const selectedArea = query.get('location') || 'All';
-
   useEffect(() => {
-    const stored = localStorage.getItem('confirmedSpotId');
-    if (stored) {
-      setParkedSpotId(stored);
-      setConfirmedSpots((prev) => ({ ...prev, [stored]: true }));
-      setActiveSpotId(stored); // Automatically open popup on reload
+    const userId = localStorage.getItem('userId');
+
+    if (userId) {
+      axios
+        .get('http://localhost:5000/api/confirmed-parking/active', {
+          params: { userId },
+        })
+        .then((res) => {
+          const activeSession = res.data;
+          if (activeSession && activeSession.spotId) {
+            console.log('✅ Active session found:', activeSession);
+
+            setConfirmedSpots((prev) => ({
+              ...prev,
+              [activeSession.spotId]: { userId },
+            }));
+            setParkedSpotId(activeSession.spotId);
+            setActiveSpotId(activeSession.spotId);
+
+            // Save locally
+            localStorage.setItem('confirmedSpotId', activeSession.spotId);
+            localStorage.setItem(
+              `parkingStart_${activeSession.spotId}`,
+              new Date(activeSession.confirmedAt).toISOString()
+            );
+          } else {
+            console.log('❌ No active session found');
+            localStorage.removeItem('confirmedSpotId');
+          }
+        })
+        .catch((err) => {
+          console.error('❌ Error checking active session:', err);
+        });
     }
   }, []);
 
@@ -104,7 +131,7 @@ const ParkingSpots = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/score/add', {
+      const res = await axios.post('https://parkify-web-app-backend.onrender.com/api/score/add', {
         email,
         username,
         score: points,
@@ -610,81 +637,102 @@ const ParkingSpots = () => {
                     Get Directions
                   </button>
                 </a>
-                {confirmedSpots[spot._id] ? (
-                <ParkingTimer
-                  spotId={spot._id}
-                  seconds={3600}
-                  onTimerEnd={() => {
-                    localStorage.removeItem("confirmedSpotId");
-                    localStorage.removeItem(`parkingStart_${spot._id}`);
-                    setConfirmedSpots(prev => {
-                      const updated = { ...prev };
-                      delete updated[spot._id];
-                      return updated;
-                    });
-                    setParkedSpotId(null);
-                  }}
-                />
-              ) : parkedSpotId && parkedSpotId !== spot._id ? (
-                <div style={{ marginTop: '6px' }}>
-                  <p style={{ color: '#555', fontWeight: 'bold' }}>
-                    You are parked at another location.
-                  </p>
-                  <button
-                    onClick={() => setActiveSpotId(parkedSpotId)}
-                    style={{
-                      backgroundColor: '#1976d2',
-                      color: 'white',
-                      padding: '6px 10px',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      width: '100%',
-                      marginTop: '4px'
-                    }}
-                  >
-                    🔄 Go to Active Spot
-                  </button>
-                </div>
+                {confirmedSpots[spot._id]?.userId === localStorage.getItem('userId') ? (
+                  (() => {
+                    const startStr = localStorage.getItem(`parkingStart_${spot._id}`);
+                    console.log('⏳ [TIMER DEBUG] startStr:', startStr);
 
-              ) : (
-                <div style={{ marginTop: '6px' }}>
-                  <strong>Are you parking here?</strong>
-                  {spot.hasSpots ? (
+                    const startTime = startStr ? new Date(startStr).getTime() : null;
+                    const now = Date.now();
+                    const duration = 3600 * 1000;
+                    const remainingMs = startTime ? startTime + duration - now : 0;
+                    const secondsLeft = Math.max(Math.floor(remainingMs / 1000), 0);
+
+                    console.log('[TIMER DEBUG] secondsLeft:', secondsLeft);
+
+                    if (!startTime || isNaN(secondsLeft)) {
+                      console.warn('Invalid startTime or secondsLeft:', startTime, secondsLeft);
+                      return (
+                        <p style={{ color: '#f44336' }}>❌ Timer failed to load. Please refresh.</p>
+                      );
+                    }
+
+                    return (
+                      <ParkingTimer
+                        spotId={spot._id}
+                        seconds={secondsLeft}
+                        onTimerEnd={() => {
+                          console.log('⏱ Timer ended for spot:', spot._id);
+                          localStorage.removeItem('confirmedSpotId');
+                          localStorage.removeItem(`parkingStart_${spot._id}`);
+                          setConfirmedSpots((prev) => {
+                            const updated = { ...prev };
+                            delete updated[spot._id];
+                            return updated;
+                          });
+                          setParkedSpotId(null);
+                        }}
+                      />
+                    );
+                  })()
+                ) : parkedSpotId && parkedSpotId !== spot._id ? (
+                  <div style={{ marginTop: '6px' }}>
+                    <p style={{ color: '#555', fontWeight: 'bold' }}>
+                      You are parked at another location.
+                    </p>
                     <button
-                      onClick={async () => {
-                        await handleStripePayment(spot);
-                        submitPoints(2, "parking_confirmed");
-                      }}
-
-                      disabled={!!parkedSpotId && parkedSpotId !== spot._id}
+                      onClick={() => setActiveSpotId(parkedSpotId)}
                       style={{
-                        backgroundColor: '#4CAF50',
+                        backgroundColor: '#1976d2',
                         color: 'white',
                         padding: '6px 10px',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         width: '100%',
-                        marginTop: '4px'
+                        marginTop: '4px',
                       }}
                     >
-                      Yes, I’m parking here
+                      🔄 Go to Active Spot
                     </button>
-                  ) : (
-                    <p style={{ color: '#f44336', marginTop: '4px' }}>
-                      ❌ Spot marked as full. Please mark it as available to confirm parking.
-                    </p>
-                  )}
-
-
-                </div>
-              )}
-
-            </div>
-          );
-        })()}
-
+                  </div>
+                ) : 
+                  isNearby ? (
+                  <div style={{ marginTop: '6px' }}>
+                    <strong>Are you parking here?</strong>
+                    {spot.hasSpots ? (
+                      <button
+                        onClick={async () => {
+                          await handleStripePayment(spot);
+                          submitPoints(2, 'parking_confirmed');
+                        }}
+                        disabled={!!parkedSpotId && parkedSpotId !== spot._id}
+                        style={{
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          padding: '6px 10px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          width: '100%',
+                          marginTop: '4px',
+                        }}
+                      >
+                        Yes, I’m parking here
+                      </button>
+                    ) : (
+                      <p style={{ color: '#f44336', marginTop: '4px' }}>
+                        ❌ Spot marked as full. Please mark it as available to confirm parking.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p style={{ color: '#f44336', fontWeight: 'bold', marginTop: '10px' }}>
+                  </p>
+                )}
+              </div>
+            );
+          })()}
       </div>
       <BottomNav />
     </div>
