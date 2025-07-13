@@ -69,7 +69,7 @@ const ParkingSpots = () => {
 
     if (userId) {
       axios
-        .get('http://localhost:5000/api/confirmed-parking/active', {
+        .get('https://parkify-web-app-backend.onrender.com/api/confirmed-parking/active', {
           params: { userId },
         })
         .then((res) => {
@@ -696,8 +696,7 @@ const ParkingSpots = () => {
                       🔄 Go to Active Spot
                     </button>
                   </div>
-                ) : 
-                  isNearby ? (
+                ) : isNearby ? (
                   <div style={{ marginTop: '6px' }}>
                     <strong>Are you parking here?</strong>
                     {spot.hasSpots ? (
@@ -727,8 +726,7 @@ const ParkingSpots = () => {
                     )}
                   </div>
                 ) : (
-                  <p style={{ color: '#f44336', fontWeight: 'bold', marginTop: '10px' }}>
-                  </p>
+                  <p style={{ color: '#f44336', fontWeight: 'bold', marginTop: '10px' }}></p>
                 )}
               </div>
             );

@@ -27,7 +27,7 @@ const Status = () => {
 
           try {
             // 1. Save to confirmed-parking collection
-            await axios.post('http://localhost:5000/api/confirmed-parking', {
+            await axios.post('https://parkify-web-app-backend.onrender.com/api/confirmed-parking', {
               userId: localStorage.getItem('userId'),
               spotId: spot._id,
               spotName: spot.name,
@@ -62,9 +62,12 @@ const Status = () => {
     const fetchActiveSession = async () => {
       try {
         const userId = localStorage.getItem('userId');
-        const res = await axios.get('http://localhost:5000/api/confirmed-parking/active', {
-          params: { userId },
-        });
+        const res = await axios.get(
+          'https://parkify-web-app-backend.onrender.com/api/confirmed-parking/active',
+          {
+            params: { userId },
+          }
+        );
 
         const session = res.data;
         if (session && session.spotId) {
@@ -155,7 +158,7 @@ const Status = () => {
 
       //  Step 2: Mark the session inactive in the database
       await axios.patch(
-        `http://localhost:5000/api/confirmed-parking/${activeSession._id}/deactivate`
+        `https://parkify-web-app-backend.onrender.com/api/confirmed-parking/${activeSession._id}/deactivate`
       );
 
       // Step 3: Clean up local state and storage
