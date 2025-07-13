@@ -7,12 +7,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Connect to DB
+// Connect to DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-// ✅ Import models and routes
+//  Import models and routes
 const FreeParking = require("./models/FreeParking");
 const authRoutes = require("./routes/auth");
 const scoreRoutes = require("./routes/score");
@@ -20,20 +20,21 @@ const confirmedParkingRoutes = require('./routes/confirmedParkingRoutes');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const checkoutRoutes = require("./routes/checkoutSession");
 
+
 app.use(express.json());
 
-// ✅ Use routes
+//  Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/score", scoreRoutes);
 app.use('/api/confirmed-parking', confirmedParkingRoutes);
 
 console.log("scoreRoutes =", scoreRoutes);
 console.log("typeof scoreRoutes =", typeof scoreRoutes);
-console.log("✅ ConfirmedParking route mounted at /api/confirmed-parking");
+console.log(" ConfirmedParking route mounted at /api/confirmed-parking");
 app.use("/api", checkoutRoutes);
 
 
-// ✅ GET all parking spots
+// GET all parking spots
 app.get("/api/free-parking", async (req, res) => {
   try {
     const spots = await FreeParking.find({});
@@ -43,7 +44,7 @@ app.get("/api/free-parking", async (req, res) => {
   }
 });
 
-// ✅ PUT to update hasSpots and availableSpots
+//  PUT to update hasSpots and availableSpots
 app.put("/api/free-parking/:id", async (req, res) => {
   try {
     const updated = await FreeParking.findByIdAndUpdate(
@@ -68,7 +69,7 @@ app.put("/api/free-parking/:id", async (req, res) => {
   }
 });
 app.use((req, res, next) => {
-  console.warn(`🚫 Unknown route hit: ${req.method} ${req.originalUrl}`);
+  console.warn(` Unknown route hit: ${req.method} ${req.originalUrl}`);
   res.status(404).send('Not Found');
 });
 

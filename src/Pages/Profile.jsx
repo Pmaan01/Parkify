@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
-import { MdHome, MdCarRental, MdSettings, MdPerson } from "react-icons/md";
+import { MdHome, MdCarRental, MdSettings, MdPerson } from 'react-icons/md';
 
 export default function Profile() {
   const [user, setUser] = useState({ name: '', email: '', phoneNumber: '', vehicleNumber: '' });
-  const[isFirstLogin, setIsFirstLogin] = useState(true);
+  const [isFirstLogin, setIsFirstLogin] = useState(true);
   const [showNavbar, setShowNavbar] = useState(true);
   const navigate = useNavigate();
   //const location = useLocation();
 
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-
       try {
-
-          /*// Decode token to get isFirstLogin
+        /*// Decode token to get isFirstLogin
           const decoded = JSON.parse(atob(token.split('.')[1]));
           console.log("Decoded token:", decoded);
           const firstLogin = decoded.isFirstLogin !== undefined ? decoded.
@@ -27,32 +24,34 @@ export default function Profile() {
           setShowNavbar(!firstLogin); // Show navbar if not first login
           */
 
-          //Fetch user profile
-          axios.get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(res => {
-            console.log("Profile response:", res.data);
-            setUser({ 
-                name: res.data.name || '', 
-                email: res.data.email || '', 
-                phoneNumber: res.data.phoneNumber || '', 
-                vehicleNumber: res.data.vehicleNumber || '' 
+        //Fetch user profile
+        axios
+          .get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((res) => {
+            console.log('Profile response:', res.data);
+            setUser({
+              name: res.data.name || '',
+              email: res.data.email || '',
+              phoneNumber: res.data.phoneNumber || '',
+              vehicleNumber: res.data.vehicleNumber || '',
             });
 
-            const firstLogin = res.data.isFirstLogin !== undefined ? res.data.
-            isFirstLogin : true;
+            const firstLogin = res.data.isFirstLogin !== undefined ? res.data.isFirstLogin : true;
             setIsFirstLogin(firstLogin);
             setShowNavbar(!firstLogin || (res.data.phoneNumber && res.data.vehicleNumber)); // Show navbar unless first login and profile incomplete
-        }).catch(err => {
+          })
+          .catch((err) => {
             console.error('Error fetching profile:', err.response?.data || err.message);
             alert('Failed to load profile.');
             navigate('/login');
-        });
+          });
       } catch (err) {
-                console.error('Error decoding token:', err);
-                alert('Invalid token. Please log in again.');
-                navigate('/login');
-            }
+        console.error('Error decoding token:', err);
+        alert('Invalid token. Please log in again.');
+        navigate('/login');
+      }
     } else {
       navigate('/login');
     }
@@ -66,16 +65,19 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-         const res = await axios.put('https://parkify-web-app-backend.onrender.com/api/auth/profile', user, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        console.log("Profile update response:", res.data);
+        const res = await axios.put(
+          'https://parkify-web-app-backend.onrender.com/api/auth/profile',
+          user,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log('Profile update response:', res.data);
         alert('Profile saved successfully!');
-      
+
         setIsFirstLogin(false); // Update local state
         setShowNavbar(true); // Show navbar after saving
-        
-        
+
         navigate('/home'); // Redirect to StartParking after saving
       } catch (err) {
         console.error('Error saving profile:', err.response ? err.response.data : err.message);
@@ -95,7 +97,11 @@ export default function Profile() {
     <div className="profile-container">
       <div className="profile-content">
         <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
-        <h2>{isFirstLogin && !(user.phoneNumber && user.vehicleNumber)? "Your Profile is incomplete" : "Edit your profile"}</h2>
+        <h2>
+          {isFirstLogin && !(user.phoneNumber && user.vehicleNumber)
+            ? 'Your Profile is incomplete'
+            : 'Edit your profile'}
+        </h2>
         <input
           type="text"
           placeholder="Name"
@@ -123,16 +129,22 @@ export default function Profile() {
         <button onClick={handleSave}>Save</button>
       </div>
 
-
-        {showNavbar && (
+      {showNavbar && (
         <div className="bottom-nav">
-            <div className="nav-icon" onClick={() => handleNavClick("/home")}><MdHome size={50} /></div>
-            <div className="nav-icon" onClick={() => handleNavClick("/status")}><MdCarRental size={50} /></div>
-            <div className="nav-icon" onClick={() => handleNavClick("/settings")}><MdSettings size={50} /></div>
-            <div className="nav-icon" onClick={() => handleNavClick("/profile")}><MdPerson size={50} /></div>
+          <div className="nav-icon" onClick={() => handleNavClick('/home')}>
+            <MdHome size={50} />
+          </div>
+          <div className="nav-icon" onClick={() => handleNavClick('/status')}>
+            <MdCarRental size={50} />
+          </div>
+          <div className="nav-icon" onClick={() => handleNavClick('/settings')}>
+            <MdSettings size={50} />
+          </div>
+          <div className="nav-icon" onClick={() => handleNavClick('/profile')}>
+            <MdPerson size={50} />
+          </div>
         </div>
-        )}
+      )}
     </div>
   );
 }
-

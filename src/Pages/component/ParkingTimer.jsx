@@ -7,13 +7,22 @@ const ParkingTimer = ({ spotId, duration = 3600, onTimerEnd }) => {
     const storageKey = `parkingStart_${spotId}`;
     const storedStartTime = localStorage.getItem(storageKey);
 
-    // 🟡 Exit early if no valid start time exists
     if (!storedStartTime) {
-      console.warn("No parking start time found for", spotId);
+      console.warn(' No parking start time found for', spotId);
       return;
     }
 
-    const startTime = Number(storedStartTime);
+    //  Robust parsing: handle timestamp or ISO string
+    let startTime = Number(storedStartTime);
+    if (isNaN(startTime)) {
+      const parsed = Date.parse(storedStartTime);
+      if (!isNaN(parsed)) {
+        startTime = parsed;
+      } else {
+        console.warn(' Invalid start time format:', storedStartTime);
+        return;
+      }
+    }
 
     const updateRemaining = () => {
       const now = Date.now();
@@ -28,7 +37,7 @@ const ParkingTimer = ({ spotId, duration = 3600, onTimerEnd }) => {
       }
     };
 
-    updateRemaining(); // run immediately
+    updateRemaining();
     const interval = setInterval(updateRemaining, 1000);
 
     return () => clearInterval(interval);
@@ -40,19 +49,21 @@ const ParkingTimer = ({ spotId, duration = 3600, onTimerEnd }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (remaining === null) return null; // Don't render if timer is not ready
+  if (remaining === null) return null;
 
   return (
-    <div style={{
-      marginTop: '10px',
-      backgroundColor: '#4CAF50',
-      color: 'white',
-      padding: '8px',
-      borderRadius: '4px',
-      textAlign: 'center',
-      fontWeight: 'bold'
-    }}>
-      ⏳ Parking confirmed: {formatTime(remaining)}
+    <div
+      style={{
+        marginTop: '10px',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        padding: '8px',
+        borderRadius: '4px',
+        textAlign: 'center',
+        fontWeight: 'bold',
+      }}
+    >
+      Parking confirmed: {formatTime(remaining)}
     </div>
   );
 };
