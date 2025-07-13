@@ -1,4 +1,4 @@
-export function isUserNearby(userLat, userLng, spotLat, spotLng, maxDistanceMeters = 200000) {
+export function isUserNearby(userLat, userLng, spotLat, spotLng, maxDistanceMeters = 2000000) {
   if (!userLat || !userLng || !spotLat || !spotLng) return false;
 
   const toRad = (value) => (value * Math.PI) / 180;
