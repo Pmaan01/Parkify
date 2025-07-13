@@ -611,76 +611,80 @@ const ParkingSpots = () => {
                   </button>
                 </a>
                 {confirmedSpots[spot._id] ? (
-                  <ParkingTimer
-                    spotId={spot._id}
-                    seconds={3600}
-                    onTimerEnd={() => {
-                      localStorage.removeItem('confirmedSpotId');
-                      localStorage.removeItem(`parkingStart_${spot._id}`);
-                      setConfirmedSpots((prev) => {
-                        const updated = { ...prev };
-                        delete updated[spot._id];
-                        return updated;
-                      });
-                      setParkedSpotId(null);
+                <ParkingTimer
+                  spotId={spot._id}
+                  seconds={3600}
+                  onTimerEnd={() => {
+                    localStorage.removeItem("confirmedSpotId");
+                    localStorage.removeItem(`parkingStart_${spot._id}`);
+                    setConfirmedSpots(prev => {
+                      const updated = { ...prev };
+                      delete updated[spot._id];
+                      return updated;
+                    });
+                    setParkedSpotId(null);
+                  }}
+                />
+              ) : parkedSpotId && parkedSpotId !== spot._id ? (
+                <div style={{ marginTop: '6px' }}>
+                  <p style={{ color: '#555', fontWeight: 'bold' }}>
+                    You are parked at another location.
+                  </p>
+                  <button
+                    onClick={() => setActiveSpotId(parkedSpotId)}
+                    style={{
+                      backgroundColor: '#1976d2',
+                      color: 'white',
+                      padding: '6px 10px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      marginTop: '4px'
                     }}
-                  />
-                ) : parkedSpotId && parkedSpotId !== spot._id ? (
-                  <div style={{ marginTop: '6px' }}>
-                    <p style={{ color: '#555', fontWeight: 'bold' }}>
-                      You are parked at another location.
-                    </p>
+                  >
+                    🔄 Go to Active Spot
+                  </button>
+                </div>
+
+              ) : (
+                <div style={{ marginTop: '6px' }}>
+                  <strong>Are you parking here?</strong>
+                  {spot.hasSpots ? (
                     <button
-                      onClick={() => setActiveSpotId(parkedSpotId)}
+                      onClick={async () => {
+                        await handleStripePayment(spot);
+                        submitPoints(2, "parking_confirmed");
+                      }}
+
+                      disabled={!!parkedSpotId && parkedSpotId !== spot._id}
                       style={{
-                        backgroundColor: '#1976d2',
+                        backgroundColor: '#4CAF50',
                         color: 'white',
                         padding: '6px 10px',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         width: '100%',
-                        marginTop: '4px',
+                        marginTop: '4px'
                       }}
                     >
-                      🔄 Go to Active Spot
+                      Yes, I’m parking here
                     </button>
-                  </div>
-                ) : isNearby ? (
-                  <div style={{ marginTop: '6px' }}>
-                    <strong>Are you parking here?</strong>
-                    {spot.hasSpots ? (
-                      <button
-                        onClick={async () => {
-                          await handleStripePayment(spot);
-                          submitPoints(2, 'parking_confirmed');
-                        }}
-                        disabled={!!parkedSpotId && parkedSpotId !== spot._id}
-                        style={{
-                          backgroundColor: '#4CAF50',
-                          color: 'white',
-                          padding: '6px 10px',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          width: '100%',
-                          marginTop: '4px',
-                        }}
-                      >
-                        Yes, I’m parking here
-                      </button>
-                    ) : (
-                      <p style={{ color: '#f44336', marginTop: '4px' }}>
-                        ❌ Spot marked as full. Please mark it as available to confirm parking.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <p style={{ color: '#f44336', fontWeight: 'bold', marginTop: '10px' }}></p>
-                )}
-              </div>
-            );
-          })()}
+                  ) : (
+                    <p style={{ color: '#f44336', marginTop: '4px' }}>
+                      ❌ Spot marked as full. Please mark it as available to confirm parking.
+                    </p>
+                  )}
+
+
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
+
       </div>
       <BottomNav />
     </div>
