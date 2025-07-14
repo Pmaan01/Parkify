@@ -8,7 +8,9 @@ const UserSchema = new mongoose.Schema({
   name: String,
   phoneNumber: String,
   vehicleNumber: String,
-  isFirstLogin: { type: Boolean, default: true }
+  isFirstLogin: { type: Boolean, default: true },
+  score: { type: Number, default: 0 }, 
+  balance: { type: Number, default: 0 }, // Added for Wallet
 
   // other fields
 });

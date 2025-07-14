@@ -19,15 +19,24 @@ router.post("/signup", async (req, res) => {
     }
 
     try {
+
+      // Check if email already exists
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+    }
         // Hash password before storing
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create a new user document
         const newUser = new User({
+            username: name, //User name as a username
             name,
-            email,
+            email: email.toLowerCase(),
             password: hashedPassword,
-            isFirstLogin: true
+            isFirstLogin: true,
+            score: 0,
+            balance: 0,
 
         });
 
@@ -40,10 +49,10 @@ router.post("/signup", async (req, res) => {
             message: "User created successfully",
             data: {
                 id: savedUser._id,
+                username: savedUser.username,
                 name: savedUser.name,
                 email: savedUser.email,
-                createdAt: savedUser.createdAt
-            }
+            },
         });
 
     } catch (err) {
@@ -104,6 +113,7 @@ router.post("/login", async (req, res) => {
         // Generate JWT token with 1-hour expiry
         const accessToken = jwt.sign(
             {
+                username: foundUser.username,
                 name: foundUser.name,
                 email: foundUser.email,
                 id: foundUser._id,
@@ -119,6 +129,7 @@ router.post("/login", async (req, res) => {
             token: accessToken,
             data: {
                 id: foundUser._id,
+                username: foundUser.username,
                 name: foundUser.name,
                 email: foundUser.email,
                 isFirstLogin: isFirstLogin
@@ -131,6 +142,7 @@ router.post("/login", async (req, res) => {
             token: accessToken,
             data: {
                 id: foundUser._id,
+                username: foundUser.username,
                 name: foundUser.name,
                 email: foundUser.email,
                 isFirstLogin: isFirstLogin
@@ -148,27 +160,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
-
-/**
- * @route   POST /api/auth/logout
- * @desc    Log out user by clearing token
- * @access  Private
- */
-router.post("/logout", async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  try {
-    // Optionally, you can blacklist the token in a database or Redis
-    // For now, just return a success message
-    res.status(200).json({ message: "Successfully logged out" });
-  } catch (err) {
-    res.status(500).json({ message: "Logout failed", error: err.message });
-  }
-});
 
 /**
  * @route   GET /api/auth/profile
@@ -191,7 +182,7 @@ router.get("/profile", async (req, res) => {
 
      // Find the user in the database using the email from the decoded token
     // Exclude the password field from the returned user object
-    const user = await User.findOne({ email: decoded.email }).select('-password');
+    const user = await User.findById(decoded.id).select('-password');
 
     console.log("👉 Profile fetched:", user); // Debug log
 
@@ -199,13 +190,34 @@ router.get("/profile", async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Return the user data
-    res.status(200).json(user);
+    res.status(200).json({
+      message: "Profile fetched successfully",
+      data: {
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        vehicleNumber: user.vehicleNumber,
+        isFirstLogin: user.isFirstLogin,
+        score: user.score || 0,
+        balance: user.balance || 0,
+      },
+    });
   } catch (err) {
 
+
+    console.error("❌ Profile fetch error:", err);
     // If token verification fails or any other error occurs, respond with 500
     res.status(500).json({ message: "Invalid token", error: err.message });
   }
 });
+
+
+/**
+ * @route   PUT /api/auth/profile
+ * @desc    Update user profile data
+ * @access  Private
+ */
 
 // Route to update the user's profile information
 router.put("/profile", async (req, res) => {
@@ -235,15 +247,80 @@ router.put("/profile", async (req, res) => {
     if (!updatedUser) return res.status(404).json({ message: "User not found" });
     
     // Send back a success message with the updated user data
-    res.status(200).json({ message: "Profile updated successfully", data: updatedUser });
-  
+    res.status(200).json({
+      message: "Profile updated successfully",
+      data: {
+        username: updatedUser.username,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
+        vehicleNumber: updatedUser.vehicleNumber,
+        isFirstLogin: updatedUser.isFirstLogin,
+        score: updatedUser.score || 0,
+        balance: updatedUser.balance || 0,
+      },
+    });
 } catch (err) {
+
+    console.error("❌ Profile update error:", err);
 
     // Catch any errors (e.g. invalid token, DB errors) and return a 500 error
     res.status(500).json({ message: "Error updating profile", error: err.message });
   }
 
 });
+
+
+/**
+ * @route   POST /api/auth/cashout
+ * @desc    Process user cash-out request
+ * @access  Private
+ */
+router.post("/cashout", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { amount, paymentMethod, paymentDetails } = req.body;
+    if (!amount || !paymentMethod || !paymentDetails) {
+      return res.status(400).json({ message: "Amount, payment method, and details are required" });
+    }
+
+    const amountNum = parseFloat(amount);
+    const pointsPerDollar = 100; // 100 points = $1
+    const pointsRequired = amountNum * pointsPerDollar;
+
+    if (user.score < pointsRequired) {
+      return res.status(400).json({ message: "Insufficient points for cash-out" });
+    }
+
+    if (amountNum < 10) {
+      return res.status(400).json({ message: "Minimum cash-out amount is $10" });
+    }
+
+    // Deduct points and add to balance (for simplicity, assume balance is updated after external processing)
+    user.score -= pointsRequired;
+    user.balance += amountNum; // Temporary balance update (in real app, this would be handled after payment confirmation)
+    await user.save();
+
+    // In a real app, integrate with PayPal or bank transfer API here
+    res.status(200).json({
+      message: "Cash-out request processed successfully",
+      data: {
+        newPoints: user.score,
+        newBalance: user.balance,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Cash-out error:", err);
+    res.status(500).json({ message: "Cash-out failed", error: err.message });
+  }
+});
+
 
 
 module.exports = router;

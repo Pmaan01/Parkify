@@ -43,7 +43,7 @@ export default function Signup() {
     <div className="auth-container">
       <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
       <h2>Sign up now and never circle the block again.</h2>
-      {loading && <div className="spinner">Loading...</div>} {/* Loading spinner */}
+      {loading && <div className="spinner"></div>} {/* Loading spinner */}
       <input
         type="text"
         placeholder="Name"
