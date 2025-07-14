@@ -9,7 +9,7 @@ import Profile from './Pages/Profile';
 import Status from './Pages/Status'; 
 import MobileContainer from './Pages/MobileContainer'; 
 import Scoreboard from "./Pages/Scoreboard";
-import Settings from './Pages/Settings';
+import Wallet from './Pages/Wallet';
 
 
 
@@ -25,7 +25,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/status" element={<Status />} /> 
         <Route path="/scoreboard" element={<Scoreboard />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/wallet" element={<Wallet />} />
         
 
       </Routes>
