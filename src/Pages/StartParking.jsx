@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../StartParking.css";
-import { MdHome, MdCarRental, MdSettings, MdPerson } from "react-icons/md";
 import BottomNav from './component/BottomNav';
 
 const StartParking = () => {
@@ -18,9 +17,7 @@ const StartParking = () => {
     navigate(`/spots?location=${encodeURIComponent(location)}&type=${selectedType}`);
   };
 
-  const handleNavClick = (path) => {
-    navigate(path);
-  };
+  
 
   return (
     <div className="start-container">
@@ -45,12 +42,6 @@ const StartParking = () => {
 
       <div className="car"></div>
 
-      <button
-        className="score-btn"
-        onClick={() => navigate("/scoreboard")}
-      >
-        🏆
-      </button>
 
       <BottomNav />
    

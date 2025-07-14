@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Scoreboard.css';
 import { useNavigate } from 'react-router-dom';
 import { MdArrowBack } from 'react-icons/md';
+import BottomNav from './component/BottomNav';
 
 export default function Scoreboard() {
   const [scores, setScores] = useState([]);
@@ -41,6 +42,9 @@ export default function Scoreboard() {
           </li>
         ))}
       </ul>
+
+        <BottomNav />
     </div>
+    
   );
 }

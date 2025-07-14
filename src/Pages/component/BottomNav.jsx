@@ -11,6 +11,7 @@ const BottomNav = () => {
     <div className="bottom-nav">
       <div className="nav-icon" onClick={() => navigate("/home")}><MdHome size={50} /></div>
       <div className="nav-icon" onClick={() => navigate("/status")}><MdCarRental size={50} /></div>
+      <div className="nav-icon" onClick={() => navigate("/scoreboard")}> <span style={{ fontSize: 50 }}>🏆</span> </div>
       <div className="nav-icon" onClick={() => navigate("/Wallet")}><MdAccountBalanceWallet size={50} /></div>
       <div className="nav-icon" onClick={() => navigate("/profile")}><MdPerson size={50} /></div>
     </div>
