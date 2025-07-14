@@ -31,16 +31,13 @@ export default function Login() {
       localStorage.setItem('username', res.data.data.name);
 
       console.log(res.data.data.email, res.data.data.name);
-      const isFirstLogin =
-        res.data.data.isFirstLogin !== undefined ? res.data.data.isFirstLogin : true;
-      console.log('isFirstLogin:', isFirstLogin); // Debug log
       alert('Login successful!');
-      navigate(isFirstLogin ? '/profile' : '/home');
+      navigate('/home'); // Always navigate to /home (StartParking.jsx)
     } catch (err) {
       console.error('Login error:', err.response?.data || err.message);
       alert('Login failed. Please check your credentials.');
     } finally {
-      setLoading(false); // Hide loading spinner
+      setLoading(false);
     }
   };
 
