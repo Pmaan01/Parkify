@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
 import BottomNav from './component/BottomNav';
@@ -7,19 +7,21 @@ import BottomNav from './component/BottomNav';
 export default function Profile() {
   const [user, setUser] = useState({ name: '', email: '', phoneNumber: '', vehicleNumber: '' });
   const [isFirstLogin, setIsFirstLogin] = useState(true);
+  const [showNavbar, setShowNavbar] = useState(true);
   const navigate = useNavigate();
-  //const location = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
 
         //Fetch user profile
-      axios
-        .get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
+      try {
+        axios
+          .get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => {
+          })
+          .then((res) => {
             console.log('Profile response:', res.data);
             setUser({
               name: res.data.name || '',
@@ -27,7 +29,9 @@ export default function Profile() {
               phoneNumber: res.data.phoneNumber || '',
               vehicleNumber: res.data.vehicleNumber || '',
             });
-            setIsFirstLogin(res.data.isFirstLogin !== undefined ? res.data.isFirstLogin : true);
+            const firstLogin = res.data.isFirstLogin !== undefined ? res.data.isFirstLogin : true;
+            setIsFirstLogin(firstLogin);
+            setShowNavbar(!firstLogin || (res.data.phoneNumber && res.data.vehicleNumber));
             
           })
           .catch((err) => {
@@ -35,10 +39,17 @@ export default function Profile() {
             alert('Failed to load profile.');
             navigate('/login');
           });
-      } else {
+
+      } catch (err) {
+        console.error('Error decoding token:', err);
+        alert('Invalid token. Please log in again.');
         navigate('/login');
-      }
-    }, [navigate]);
+      } 
+      
+    } else {
+        navigate('/login');
+    }
+  }, [navigate]);
 
   const handleSave = async () => {
     if (isFirstLogin && (!user.phoneNumber || !user.vehicleNumber)) {
@@ -59,8 +70,13 @@ export default function Profile() {
         alert('Profile saved successfully!');
 
         setIsFirstLogin(false); // Update local state
+        setShowNavbar(true);
 
-        navigate('/home'); // Navigate back to StartParking after saving
+        // Navigate back to the previous route or default to /home
+        const returnTo = localStorage.getItem('returnTo') || '/home';
+        localStorage.removeItem('returnTo'); // Clean up
+        navigate(returnTo);
+        
       } catch (err) {
         console.error('Error saving profile:', err.response ? err.response.data : err.message);
         alert('Failed to save profile.');
