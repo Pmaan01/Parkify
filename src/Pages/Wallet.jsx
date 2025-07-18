@@ -24,7 +24,7 @@ const POINT_TO_DOLLAR = 0.001;
       return;
     }
 
-    const url = `http://localhost:5000/api/score/user/${email}`;
+    const url = `https://parkify-web-app-backend.onrender.com/api/score/user/${email}`;
     console.log('📤 Sending request to:', url);
 
     axios
