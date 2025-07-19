@@ -4,7 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 router.post('/create-checkout-session', async (req, res) => {
   const { spotName, price } = req.body;
-  const origin = req.headers.origin || req.headers.referer || 'http://localhost:5000';
+const origin = process.env.FRONTEND_URL || 'http://localhost:5000';
 
 
   try {
@@ -25,6 +25,7 @@ router.post('/create-checkout-session', async (req, res) => {
       ],
       success_url: `${origin}/status?success=true`,
       cancel_url: `${origin}/status?canceled=true`,
+
     });
 
     res.json({ url: session.url });
