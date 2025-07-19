@@ -8,46 +8,42 @@ export default function Profile() {
   const [user, setUser] = useState({ name: '', email: '', phoneNumber: '', vehicleNumber: '' });
   const [isFirstLogin, setIsFirstLogin] = useState(true);
   const [showNavbar, setShowNavbar] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-
-        //Fetch user profile
-      try {
-        axios
-          .get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
+      // Fetch user profile
+      axios
+        .get('https://parkify-web-app-backend.onrender.com/api/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((res) => {
-            console.log('Profile response:', res.data);
-            setUser({
-              name: res.data.name || '',
-              email: res.data.email || '',
-              phoneNumber: res.data.phoneNumber || '',
-              vehicleNumber: res.data.vehicleNumber || '',
-            });
-            const firstLogin = res.data.isFirstLogin !== undefined ? res.data.isFirstLogin : true;
-            setIsFirstLogin(firstLogin);
-            setShowNavbar(!firstLogin || (res.data.phoneNumber && res.data.vehicleNumber));
-            
-          })
-          .catch((err) => {
-            console.error('Error fetching profile:', err.response?.data || err.message);
-            alert('Failed to load profile.');
-            navigate('/login');
+        })
+        .then((res) => {
+          const userData = res.data.data;
+          console.log('Profile response:', userData);
+
+          setUser({
+            name: userData.name || '',
+            email: userData.email || '',
+            phoneNumber: userData.phoneNumber || '',
+            vehicleNumber: userData.vehicleNumber || '',
           });
 
-      } catch (err) {
-        console.error('Error decoding token:', err);
-        alert('Invalid token. Please log in again.');
-        navigate('/login');
-      } 
-      
+          const firstLogin = userData.isFirstLogin !== undefined ? userData.isFirstLogin : true;
+          setIsFirstLogin(firstLogin);
+          setShowNavbar(!firstLogin || (userData.phoneNumber && userData.vehicleNumber));
+          setLoading(false); 
+        })
+        .catch((err) => {
+          console.error('Error fetching profile:', err.response?.data || err.message);
+          alert('Failed to load profile.');
+          setLoading(false);  
+          navigate('/login');
+        });
     } else {
-        navigate('/login');
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -56,6 +52,7 @@ export default function Profile() {
       alert('Please fill in Phone Number and Vehicle Number to complete your profile.');
       return;
     }
+
     const token = localStorage.getItem('token');
     if (token) {
       try {
@@ -69,14 +66,12 @@ export default function Profile() {
         console.log('Profile update response:', res.data);
         alert('Profile saved successfully!');
 
-        setIsFirstLogin(false); // Update local state
+        setIsFirstLogin(false);
         setShowNavbar(true);
 
-        // Navigate back to the previous route or default to /home
         const returnTo = localStorage.getItem('returnTo') || '/home';
-        localStorage.removeItem('returnTo'); // Clean up
+        localStorage.removeItem('returnTo');
         navigate(returnTo);
-        
       } catch (err) {
         console.error('Error saving profile:', err.response ? err.response.data : err.message);
         alert('Failed to save profile.');
@@ -86,6 +81,16 @@ export default function Profile() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="profile-content">
+          <img src="/Parkify-logo.jpg" alt="Parkify Logo" className="logo" />
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
@@ -102,7 +107,8 @@ export default function Profile() {
           type="email"
           placeholder="Email"
           value={user.email}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          disabled 
+          readOnly
         />
         <input
           type="tel"
@@ -118,7 +124,8 @@ export default function Profile() {
         />
         <button onClick={handleSave}>Save</button>
       </div>
-      <BottomNav />
+
+      {showNavbar && <BottomNav />}
     </div>
   );
 }
