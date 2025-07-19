@@ -64,7 +64,7 @@ const ParkingSpots = () => {
   const [confirmedSpots, setConfirmedSpots] = useState({});
   const [activeSpotId, setActiveSpotId] = useState(null);
   const [popupPosition, setPopupPosition] = useState(null);
-
+  
   const query = new URLSearchParams(useLocation().search);
   const selectedArea = query.get('location') || 'All';
 
@@ -76,7 +76,7 @@ const ParkingSpots = () => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
-          const user = res.data;
+          const user = res.data.data;
           const isComplete = user.phoneNumber && user.vehicleNumber;
           setIsProfileComplete(isComplete);
           if (!isComplete) {

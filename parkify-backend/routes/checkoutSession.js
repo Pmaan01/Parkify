@@ -1,18 +1,20 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-router.post("/create-checkout-session", async (req, res) => {
+router.post('/create-checkout-session', async (req, res) => {
   const { spotName, price } = req.body;
+  const origin = req.headers.origin || req.headers.referer || 'http://localhost:5000';
+
 
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
+      payment_method_types: ['card'],
+      mode: 'payment',
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: 'usd',
             product_data: {
               name: `Parking Spot: ${spotName}`,
             },
@@ -21,13 +23,13 @@ router.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "https://parkify-web-app-xi.vercel.app/status?success=true",
-      cancel_url: "https://parkify-web-app-xi.vercel.app/status?canceled=true",
+      success_url: `${origin}/status?success=true`,
+      cancel_url: `${origin}/status?canceled=true`,
     });
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error("❌ Stripe Error:", error.message);
+    console.error('❌ Stripe Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
