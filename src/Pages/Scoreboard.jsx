@@ -12,7 +12,7 @@ export default function Scoreboard() {
   useEffect(() => {
     console.log('📤 Fetching top scores from backend...');
     axios
-      .get('https://parkify-web-app-backend.onrender.com/api/score/top')
+      .get('https://parkify-5cf7.onrender.com/api/score/top')
       .then((res) => {
         console.log('✅ Received scores:', res.data);
         setScores(res.data);
