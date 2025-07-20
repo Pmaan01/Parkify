@@ -114,21 +114,21 @@ node server.js
 ### 4. Add environment variables
 Create a `.env` file inside the `parkify-backend/` folder with the following content:
 
-# MongoDB Connection
+#### MongoDB Connection
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/parkifydev?retryWrites=true&w=majority
 MONGO_URI_1=mongodb+srv://<username>:<password>@cluster0.mongodb.net/
 DB_NAME=parkifydev
 
-# JWT or App Secret
+#### JWT or App Secret
 SECRET_KEY=your_secret_key
 
-# Stripe Key (test or live)
+#### Stripe Key (test or live)
 STRIPE_SECRET_KEY=sk_test_your_test_key_here
 
-# Frontend URL for CORS setup
+#### Frontend URL for CORS setup
 CLIENT_URL=http://localhost:3000
 
-🔮 Future Improvements
+### 🔮 Future Improvements
 Admin dashboard for moderating reports
 
 SMS/email reminders before parking expires
@@ -139,7 +139,7 @@ Native mobile app (React Native or Flutter)
 
 AI-based prediction of free spots based on historical data
 
-## 👥 Team
+### 👥 Team
 
 | Name                  | Role                 | Responsibilities                                                                                           |
 |-----------------------|----------------------|------------------------------------------------------------------------------------------------------------|
@@ -148,7 +148,7 @@ AI-based prediction of free spots based on historical data
 | **Ardalan Maroof**     | Full Stack Developer  | Profile Page, Wallet System, Backend Integration for Profile & Wallet                      |
 
 
-## 🙌 Acknowledgements
+### 🙌 Acknowledgements
 
 - [Leaflet](https://leafletjs.com/) – Interactive maps
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) – Cloud database hosting
