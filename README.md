@@ -62,38 +62,39 @@ Parkify is a full-stack web application that helps users locate real-time **avai
 - Leaderboard shows top contributing users
 
 ---
-
 ## 📁 Project Structure
-Parkify/
-├── node_modules/ # Project dependencies
-├── parkify-backend/ # Backend (Node.js + Express)
-│ ├── models/ # Mongoose models
-│ ├── routes/ # Express routes
-│ ├── .env # Environment variables
-│ ├── db.js # MongoDB connection
-│ ├── server.js # Backend entry point
-│ ├── package.json
-│ └── package-lock.json
-├── public/ # Public assets for frontend
-├── src/ # React frontend source
-│ ├── assets/ # Images, icons, etc.
-│ ├── context/ # React context/state management
-│ ├── Pages/ # App screens/pages
-│ ├── App.jsx # Main App component
-│ ├── App.css # App-wide styles
-│ ├── index.css # Global styles
-│ ├── main.jsx # React entry point
-│ ├── ParkingSpots.css # Map styles
-│ └── StartParking.css # Start page styles
-├── index.html # Main HTML template
-├── .gitignore # Files to ignore in Git
-├── .prettierrc # Prettier formatting config
-├── eslint.config.js # ESLint configuration
-├── package.json # Frontend dependencies and scripts
-├── package-lock.json
-├── README.md # Project documentation
-├── vercel.json # Vercel deployment config
-└── vite.config.js # Vite build tool config
+
+- `Parkify/`
+  - `node_modules/` – Project dependencies
+  - `parkify-backend/` – Backend (Node.js + Express)
+    - `models/` – Mongoose models
+    - `routes/` – Express routes
+    - `.env` – Environment variables
+    - `db.js` – MongoDB connection
+    - `server.js` – Backend entry point
+    - `package.json`
+    - `package-lock.json`
+  - `public/` – Public assets for frontend
+  - `src/` – React frontend source
+    - `assets/` – Images, icons, etc.
+    - `context/` – React context/state management
+    - `Pages/` – App screens/pages
+    - `App.jsx` – Main App component
+    - `App.css` – App-wide styles
+    - `index.css` – Global styles
+    - `main.jsx` – React entry point
+    - `ParkingSpots.css` – Map styles
+    - `StartParking.css` – Start page styles
+  - `index.html` – Main HTML template
+  - `.gitignore` – Git ignored files
+  - `.prettierrc` – Prettier formatting config
+  - `eslint.config.js` – ESLint configuration
+  - `package.json` – Frontend dependencies and scripts
+  - `package-lock.json`
+  - `README.md` – Project documentation
+  - `vercel.json` – Vercel deployment config
+  - `vite.config.js` – Vite build tool config
+
 
 ## 🧪 How to Run Locally
 
