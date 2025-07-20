@@ -128,7 +128,7 @@ STRIPE_SECRET_KEY=sk_test_your_test_key_here
 #### Frontend URL for CORS setup
 CLIENT_URL=http://localhost:3000
 
-### 🔮 Future Improvements
+## 🔮 Future Improvements
 Admin dashboard for moderating reports
 
 SMS/email reminders before parking expires
@@ -139,7 +139,7 @@ Native mobile app (React Native or Flutter)
 
 AI-based prediction of free spots based on historical data
 
-### 👥 Team
+## 👥 Team
 
 | Name                  | Role                 | Responsibilities                                                                                           |
 |-----------------------|----------------------|------------------------------------------------------------------------------------------------------------|
@@ -148,7 +148,7 @@ AI-based prediction of free spots based on historical data
 | **Ardalan Maroof**     | Full Stack Developer  | Profile Page, Wallet System, Backend Integration for Profile & Wallet                      |
 
 
-### 🙌 Acknowledgements
+## 🙌 Acknowledgements
 
 - [Leaflet](https://leafletjs.com/) – Interactive maps
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) – Cloud database hosting
