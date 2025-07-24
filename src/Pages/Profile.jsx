@@ -125,7 +125,7 @@ export default function Profile() {
         <button onClick={handleSave}>Save</button>
       </div>
 
-      {showNavbar && <BottomNav />}
+      {<BottomNav />}
     </div>
   );
 }
