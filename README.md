@@ -6,7 +6,8 @@ Parkify is a full-stack web application that helps users locate real-time **avai
 
 ## 🌐 Live Demo
 
-- **Frontend:** [https://parkify.vercel.app](parkify-amber.vercel.app)
+- **Frontend:** [Parkify Link](https://parkify-web-app-xi.vercel.app)
+
 ---
 
 ## 🧰 Tech Stack
